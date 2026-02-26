@@ -1,0 +1,189 @@
+{
+  "scan_id": "SCAN-20260221202755",
+  "started_at": "2026-02-21T20:27:55.823694Z",
+  "completed_at": "2026-02-21T20:27:59.119975Z",
+  "network": "192.168.100.0/24",
+  "mode": "demo",
+  "total_vulnerabilities": 10,
+  "vt_enriched": 2,
+  "severity_summary": {
+    "Critical": 7,
+    "High": 3,
+    "Medium": 0,
+    "Low": 0
+  },
+  "vulnerabilities": [
+    {
+      "cve_id": "CVE-2024-21413",
+      "host_ip": "192.168.100.101",
+      "hostname": "win-endpoint",
+      "package": "Microsoft Outlook",
+      "current_version": "16.0.17029",
+      "fixed_version": "16.0.17328",
+      "cvss_score": 9.8,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": true,
+      "vt_ip_report": {
+        "ip": "192.168.100.101",
+        "malicious": 0,
+        "suspicious": 0,
+        "country": "unknown",
+        "asn": 0,
+        "as_owner": "unknown",
+        "reputation": 0,
+        "source": "virustotal_live"
+      }
+    },
+    {
+      "cve_id": "CVE-2024-6387",
+      "host_ip": "192.168.100.102",
+      "hostname": "linux-endpoint",
+      "package": "openssh-server",
+      "current_version": "8.2p1",
+      "fixed_version": "9.8p1",
+      "cvss_score": 8.1,
+      "severity": "High",
+      "status": "available",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2021-44228",
+      "host_ip": "192.168.100.30",
+      "hostname": "db-server",
+      "package": "log4j-core",
+      "current_version": "2.14.0",
+      "fixed_version": "2.17.1",
+      "cvss_score": 10.0,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": true,
+      "vt_ip_report": {
+        "ip": "192.168.100.30",
+        "malicious": 0,
+        "suspicious": 0,
+        "country": "unknown",
+        "asn": 0,
+        "as_owner": "unknown",
+        "reputation": 0,
+        "source": "virustotal_live"
+      }
+    },
+    {
+      "cve_id": "CVE-2023-23397",
+      "host_ip": "192.168.100.101",
+      "hostname": "win-endpoint",
+      "package": "Microsoft Outlook",
+      "current_version": "16.0.16827",
+      "fixed_version": "16.0.16924",
+      "cvss_score": 9.1,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": true,
+      "vt_ip_report": {
+        "ip": "192.168.100.101",
+        "malicious": 0,
+        "suspicious": 0,
+        "country": "unknown",
+        "asn": 0,
+        "as_owner": "unknown",
+        "reputation": 0,
+        "source": "virustotal_live"
+      }
+    },
+    {
+      "cve_id": "CVE-2024-3400",
+      "host_ip": "192.168.100.20",
+      "hostname": "zabbix-server",
+      "package": "panos",
+      "current_version": "10.2.3",
+      "fixed_version": "10.2.9-h1",
+      "cvss_score": 10.0,
+      "severity": "Critical",
+      "status": "available",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2023-44487",
+      "host_ip": "192.168.100.40",
+      "hostname": "dashboard",
+      "package": "nginx",
+      "current_version": "1.18.0",
+      "fixed_version": "1.25.3",
+      "cvss_score": 7.5,
+      "severity": "High",
+      "status": "available",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2024-1709",
+      "host_ip": "192.168.100.102",
+      "hostname": "linux-endpoint",
+      "package": "connectwise-ctrl",
+      "current_version": "22.9",
+      "fixed_version": "23.9.8",
+      "cvss_score": 10.0,
+      "severity": "Critical",
+      "status": "available",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2023-28771",
+      "host_ip": "192.168.100.10",
+      "hostname": "wazuh-manager",
+      "package": "zyxel-firmware",
+      "current_version": "5.36",
+      "fixed_version": "5.36 Patch1",
+      "cvss_score": 9.8,
+      "severity": "Critical",
+      "status": "applied",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2022-30190",
+      "host_ip": "192.168.100.101",
+      "hostname": "win-endpoint",
+      "package": "msdt.exe",
+      "current_version": "10.0.19041",
+      "fixed_version": "KB5014699",
+      "cvss_score": 7.8,
+      "severity": "High",
+      "status": "applied",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2024-21762",
+      "host_ip": "192.168.100.30",
+      "hostname": "db-server",
+      "package": "fortios",
+      "current_version": "7.4.1",
+      "fixed_version": "7.4.3",
+      "cvss_score": 9.6,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": false
+    }
+  ],
+  "vt_ip_reports": {
+    "192.168.100.101": {
+      "ip": "192.168.100.101",
+      "malicious": 0,
+      "suspicious": 0,
+      "country": "unknown",
+      "asn": 0,
+      "as_owner": "unknown",
+      "reputation": 0,
+      "source": "virustotal_live"
+    },
+    "192.168.100.30": {
+      "ip": "192.168.100.30",
+      "malicious": 0,
+      "suspicious": 0,
+      "country": "unknown",
+      "asn": 0,
+      "as_owner": "unknown",
+      "reputation": 0,
+      "source": "virustotal_live"
+    }
+  }
+}
