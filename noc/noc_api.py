@@ -9,6 +9,8 @@ from noc.noc_trending import router as trending_router
 from noc.noc_correlation import router as correlation_router
 from noc.noc_forecasting import router as forecasting_router
 from noc.noc_metrics import router as metrics_router
+from noc.noc_audit import router as audit_router
+from noc.noc_remediation import router as remediation_router
 from noc.noc_utils import get_zabbix_auth, get_cpu_usage, ZABBIX_API
 
 noc_router = APIRouter(prefix="/noc", tags=["NOC"])
@@ -19,12 +21,24 @@ noc_router.include_router(trending_router)
 noc_router.include_router(correlation_router)
 noc_router.include_router(forecasting_router)
 noc_router.include_router(metrics_router)
+noc_router.include_router(audit_router)
+noc_router.include_router(remediation_router)
+
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
 
 @noc_router.get("/status")
 def get_noc_status():
     """NOC system health check"""
     try:
         auth = get_zabbix_auth()
+        if not auth and DEMO_MODE:
+            return {
+                "status": "operational",
+                "zabbix_reachable": True,
+                "auth_ok": True,
+                "demo": True,
+                "module": "ICOC NOC Module"
+            }
         return {
             "status": "operational" if auth else "degraded",
             "zabbix_reachable": True if auth else False,
@@ -42,6 +56,15 @@ def get_noc_summary():
     """Get NOC summary for dashboard"""
     try:
         auth = get_zabbix_auth()
+        if not auth and DEMO_MODE:
+             return {
+                "monitored_hosts": 12, 
+                "active_alerts": 3, 
+                "noc_status": "operational",
+                "demo": True,
+                "module": "ICOC NOC Module"
+             }
+        
         if not auth:
              return {"monitored_hosts": 0, "active_alerts": 0, "noc_status": "offline"}
         

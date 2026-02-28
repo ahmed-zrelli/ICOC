@@ -84,6 +84,23 @@ def attack_launched(attack: AttackEvent):
         severity   = "High"
         summary    = f"Attack: {attack.attack_type}"
 
+    # 3. Log to NOC Audit Trail for visibility in NOC Center
+    try:
+        from database import log_noc_action
+        log_noc_action(
+            action="SECURITY_ALERT",
+            module="ATTACKER",
+            details={
+                "attack_type": attack.attack_type,
+                "summary": summary,
+                "target": attack.victim_ip,
+                "severity": severity
+            },
+            status="Critical" if severity == "Critical" else "Warning"
+        )
+    except Exception:
+        pass
+
     security_event = {
         "agent_id":   "attacker-module",
         "host_ip":    attack.attacker_ip,

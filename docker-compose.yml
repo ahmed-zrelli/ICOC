@@ -45,7 +45,9 @@ services:
     volumes:
       - ./voc:/app/voc
       - ./ai:/app/ai
-      - ./noc:/app/noc                    # ← ADD THIS (your NOC API)
+      - ./noc:/app/noc
+      - ./noc/noc_audit.py:/app/noc/noc_audit.py
+      - ./noc/noc_remediation.py:/app/noc/noc_remediation.py
       - ./main.py:/app/main.py
       - ./database.py:/app/database.py
       - ./event_store.py:/app/event_store.py

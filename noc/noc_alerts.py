@@ -40,7 +40,7 @@ async def fetch_active_alerts():
         v_alerts = get_virtual_alerts()
         
         # Auto-create incidents for high priority alerts
-        from database import create_noc_incident, get_noc_incidents
+        from database import create_noc_incident, get_noc_incidents, log_noc_action
         existing_incidents = get_noc_incidents(status="Open")
         existing_desc = [inc['description'] for inc in existing_incidents]
 
@@ -52,10 +52,22 @@ async def fetch_active_alerts():
             host_name = t['hosts'][0]['name'] if t['hosts'] else "Unknown"
 
             if priority >= 4 and f"AUTO-ALERT: {desc}" not in existing_desc:
-                create_noc_incident(
+                incident_id = create_noc_incident(
                     host=host_name,
                     description=f"AUTO-ALERT: {desc}",
                     severity="Critical" if priority >= 5 else "High"
+                )
+                # Log the auto-creation to audit trail
+                log_noc_action(
+                    action="AUTO_INCIDENT_CREATION",
+                    module="ALERTS",
+                    details={
+                        "trigger_id": t['triggerid'],
+                        "description": desc,
+                        "host": host_name,
+                        "incident_id": incident_id
+                    },
+                    status="Success"
                 )
 
             alerts.append({

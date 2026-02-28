@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 import requests
 import os
+from database import log_noc_action
 
 router = APIRouter()
 
@@ -28,12 +29,13 @@ async def get_sla_metrics():
         return []
 
     try:
-        # Get hosts with availability status
+        # Get hosts with availability status from interfaces
         response = requests.post(ZABBIX_API, json={
             "jsonrpc": "2.0",
             "method": "host.get",
             "params": {
-                "output": ["name", "available", "error"],
+                "output": ["name"],
+                "selectInterfaces": ["available", "type", "main"],
                 "monitored_hosts": True
             },
             "auth": auth,
@@ -44,10 +46,33 @@ async def get_sla_metrics():
         
         sla_data = []
         for h in hosts:
-            availability = int(h.get('available', 0))
+            # Find the main Zabbix agent interface (type 1, main 1)
+            interfaces = h.get('interfaces', [])
+            availability = 0 # Default to Unknown
+            
+            for iface in interfaces:
+                if iface.get('main') == '1' and iface.get('type') == '1':
+                    availability = int(iface.get('available', 0))
+                    break
+            
+            # If no main agent interface, check any available interface
+            if availability == 0 and interfaces:
+                for iface in interfaces:
+                    if int(iface.get('available', 0)) == 1:
+                        availability = 1
+                        break
+            
             status = "Compliant" if availability == 1 else "Critical" if availability == 2 else "Unknown"
             uptime = "100.00%" if availability == 1 else "0.00%"
             
+            if status == "Critical":
+                log_noc_action(
+                    action="SLA_BREACH_DETECTED",
+                    module="SLA",
+                    details={"host": h.get('name'), "uptime": uptime, "status": status},
+                    status="Critical"
+                )
+
             sla_data.append({
                 "service": h.get('name'),
                 "uptime": uptime,

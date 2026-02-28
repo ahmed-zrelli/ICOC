@@ -32,6 +32,18 @@ VICTIM_HTTP = int(os.getenv("VICTIM_HTTP_PORT", "8080"))
 ATTACKER_IP = os.getenv("ATTACKER_IP", "192.168.100.200")
 API_URL     = os.getenv("ICOC_API_URL", "http://api:8000")
 
+# ── Block Check ──────────────────────────────────────────────────────────────
+
+def is_blocked():
+    """Check if the attacker IP is functionally blocked by the NOC."""
+    block_file = "/tmp/shared/blocked_ips.txt"
+    if os.path.exists(block_file):
+        with open(block_file, "r") as f:
+            blocked = [line.strip() for line in f.readlines()]
+            if ATTACKER_IP in blocked:
+                return True
+    return False
+
 # ── Color output ─────────────────────────────────────────────────────────────
 
 RED    = "\033[91m"
@@ -80,6 +92,10 @@ def attack_ssh_brute(username: str = "root", delay: float = 0.3):
     Tries common passwords until success.
     Triggers: FR-SOC-02 (5 fails in 5 min), agent auth log monitor.
     """
+    if is_blocked():
+        warn(f"ABORTED: Attacker IP {ATTACKER_IP} is BLOCKED by NOC.")
+        return False, None
+
     banner("ATTACK 1: SSH BRUTE FORCE")
     attack(f"Target: {VICTIM_IP}:{VICTIM_SSH} | User: {username}")
     attack(f"Wordlist: {len(SSH_WORDLIST)} passwords")
@@ -143,6 +159,10 @@ def attack_port_scan(timeout: float = 0.5):
     Scans common ports on victim.
     Triggers: NOC port monitoring, agent PortMonitor.
     """
+    if is_blocked():
+        warn(f"ABORTED: Attacker IP {ATTACKER_IP} is BLOCKED by NOC.")
+        return []
+
     banner("ATTACK 2: PORT SCAN")
     attack(f"Target: {VICTIM_IP} | Scanning {len(COMMON_PORTS)} ports")
     notify_api("port_scan", {"target": VICTIM_IP, "ports": COMMON_PORTS})
@@ -199,6 +219,10 @@ def attack_cve_exploit(cve_id: str = "CVE-2024-6387"):
     Sends exploit payload to victim service.
     Triggers: VOC scanner to re-evaluate, AI risk score spike.
     """
+    if is_blocked():
+        warn(f"ABORTED: Attacker IP {ATTACKER_IP} is BLOCKED by NOC.")
+        return False
+
     banner(f"ATTACK 3: CVE EXPLOIT — {cve_id}")
     exploit = CVE_EXPLOITS.get(cve_id, CVE_EXPLOITS["CVE-2024-6387"])
     attack(f"CVE: {cve_id} | {exploit['name']} | CVSS: {exploit['cvss']}")
@@ -243,6 +267,10 @@ def attack_sqli(path: str = "/login"):
     Attack 4: SQL Injection against victim web app.
     Triggers: Web app firewall event, process anomaly (unusual DB queries).
     """
+    if is_blocked():
+        warn(f"ABORTED: Attacker IP {ATTACKER_IP} is BLOCKED by NOC.")
+        return []
+
     banner("ATTACK 4: SQL INJECTION")
     attack(f"Target: http://{VICTIM_IP}:{VICTIM_HTTP}{path}")
     notify_api("sqli_attack", {"target": f"{VICTIM_IP}:{VICTIM_HTTP}", "path": path})
@@ -289,6 +317,10 @@ def attack_lfi(path: str = "/download"):
     Attack 5: Local File Inclusion / Path Traversal.
     Attempts to read sensitive files via web app.
     """
+    if is_blocked():
+        warn(f"ABORTED: Attacker IP {ATTACKER_IP} is BLOCKED by NOC.")
+        return
+
     banner("ATTACK 5: LFI / PATH TRAVERSAL")
     attack(f"Target: http://{VICTIM_IP}:{VICTIM_HTTP}{path}")
     notify_api("lfi_attack", {"target": f"{VICTIM_IP}:{VICTIM_HTTP}", "path": path})

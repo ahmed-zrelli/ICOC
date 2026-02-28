@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+from datetime import datetime
 from fastapi import HTTPException
 
 ZABBIX_API = os.getenv("ZABBIX_API_URL", "http://192.168.100.21:8080/api_jsonrpc.php")
@@ -140,10 +141,81 @@ def get_network_latency_and_throughput():
 def get_virtual_alerts():
     """Generate virtual alerts based on dynamic baselines and forecasting logic."""
     auth = get_zabbix_auth()
-    if not auth:
-        return []
-
+    
     virtual_alerts = []
+    
+    # Check if a simulation was triggered recently (last 2 minutes)
+    from database import get_noc_audit_trail
+    try:
+        recent_audit = get_noc_audit_trail(limit=5)
+        simulation_active = False
+        now = datetime.utcnow()
+        for a in recent_audit:
+            if a['action'] == "SIMULATE_ATTACK":
+                ts = a['timestamp']
+                # If timestamp is already a datetime object (psycopg2 default)
+                if not isinstance(ts, datetime):
+                    try:
+                        ts = datetime.fromisoformat(str(ts).replace('Z', ''))
+                    except:
+                        continue
+                
+                # Make both naive for comparison if needed
+                if ts.tzinfo is not None:
+                    ts = ts.replace(tzinfo=None)
+                
+                if (now - ts).total_seconds() < 120:
+                    simulation_active = True
+                    break
+    except Exception as e:
+        print(f"[VIRTUAL-ALERTS-SIM] Error: {e}")
+        simulation_active = False
+
+    if simulation_active:
+        virtual_alerts.append({
+            "id": "v-sim-01",
+            "host": "Global Load Balancer",
+            "description": "CRITICAL: Unexpected traffic surge detected (Visualization Simulation)",
+            "severity": 5,
+            "time": int(time.time()),
+            "type": "virtual"
+        })
+        virtual_alerts.append({
+            "id": "v-sim-02",
+            "host": "Victim Host",
+            "description": "HIGH: Connection queue full on frontend service",
+            "severity": 4,
+            "time": int(time.time()),
+            "type": "virtual"
+        })
+
+    # NEW: Fetch recent security attacks from SOC events
+    try:
+        from database import get_events
+        # Get last 5 minutes of high/critical security events
+        recent_security = get_events(limit=10, severity="Critical") + get_events(limit=10, severity="High")
+        for evt in recent_security:
+            # Check if event is recent (last 10 minutes)
+            evt_ts = evt['timestamp']
+            if not isinstance(evt_ts, datetime):
+                evt_ts = datetime.fromisoformat(str(evt_ts).replace('Z', ''))
+            if evt_ts.tzinfo is not None: evt_ts = evt_ts.replace(tzinfo=None)
+            
+            if (datetime.utcnow() - evt_ts).total_seconds() < 600:
+                virtual_alerts.append({
+                    "id": f"sec-{evt['id']}",
+                    "host": evt.get('hostname', 'Unknown'),
+                    "description": f"SECURITY: {evt['data'].get('summary', evt['event_type'])}",
+                    "severity": 5 if evt['severity'] == "Critical" else 4,
+                    "time": int(evt_ts.timestamp()),
+                    "type": "security"
+                })
+    except Exception as e:
+        print(f"[VIRTUAL-ALERTS-SEC] Error: {e}")
+
+    if not auth:
+        return virtual_alerts
+
     try:
         # Fetch items for common monitors
         response = requests.post(ZABBIX_API, json={
@@ -169,11 +241,12 @@ def get_virtual_alerts():
                 
                 # Check CPU Anomaly
                 baseline = get_historical_baseline(itemid, hours=6)
+                val_rounded = round(val, 2)
                 if baseline and val > baseline * 2.0: # 100% above baseline = Critical
                     virtual_alerts.append({
                         "id": f"v-cpu-{itemid}",
                         "host": host_name,
-                        "description": f"Dynamic Anomaly: CPU usage ({val}%) is 2x above baseline ({round(baseline,2)}%)",
+                        "description": f"Dynamic Anomaly: CPU usage ({val_rounded}%) is 2x above baseline ({round(baseline,2)}%)",
                         "severity": 5, # Critical
                         "time": int(time.time()),
                         "type": "virtual"
@@ -182,7 +255,7 @@ def get_virtual_alerts():
                     virtual_alerts.append({
                         "id": f"v-cpu-{itemid}",
                         "host": host_name,
-                        "description": f"Dynamic Anomaly: CPU usage ({val}%) is 50% above baseline ({round(baseline,2)}%)",
+                        "description": f"Dynamic Anomaly: CPU usage ({val_rounded}%) is 50% above baseline ({round(baseline,2)}%)",
                         "severity": 3, # Warning
                         "time": int(time.time()),
                         "type": "virtual"

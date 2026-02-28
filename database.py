@@ -241,6 +241,18 @@ CREATE TABLE IF NOT EXISTS compliance_snapshots (
     computed_at     TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_compliance_time ON compliance_snapshots(computed_at DESC);
+
+-- NOC Audit Trail for Advanced Logging and Audit Trails
+CREATE TABLE IF NOT EXISTS noc_audit_trail (
+    id              BIGSERIAL PRIMARY KEY,
+    action          VARCHAR(100) NOT NULL,
+    module          VARCHAR(50),
+    user_id         VARCHAR(50) DEFAULT 'system',
+    details         JSONB DEFAULT '{}',
+    status          VARCHAR(20),
+    timestamp       TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_noc_audit_time ON noc_audit_trail(timestamp DESC);
 """
 
 def create_schema():
@@ -880,6 +892,14 @@ def create_noc_incident(host, description, severity, status="Open", assigned_to=
     with get_conn() as conn:
         with get_cursor(conn) as cur:
             cur.execute(sql, (incident_id, host, description, severity, status, assigned_to))
+            
+            # Log this creation to audit trail
+            log_noc_action(
+                action="CREATE_INCIDENT",
+                module="INCIDENTS",
+                details={"incident_id": incident_id, "host": host, "severity": severity},
+                status="Success"
+            )
             return cur.fetchone()["incident_id"]
 
 def get_noc_incidents(status=None):
@@ -919,7 +939,39 @@ def update_noc_incident(incident_id, status=None, notes=None, assigned_to=None):
     with get_conn() as conn:
         with get_cursor(conn) as cur:
             cur.execute(sql, tuple(params))
+            
+            # Log this update to audit trail
+            log_noc_action(
+                action="UPDATE_INCIDENT",
+                module="INCIDENTS",
+                details={"incident_id": incident_id, "status": status, "assigned_to": assigned_to, "notes": notes},
+                status="Success"
+            )
             return True
+
+# ── NOC Audit Trail Functions ────────────────────────────────────────────────
+
+def log_noc_action(action: str, module: str = "NOC", user_id: str = "system", details: dict = None, status: str = "Success"):
+    """Insert a new NOC audit trail entry."""
+    sql = """
+        INSERT INTO noc_audit_trail (action, module, user_id, details, status)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+    with get_conn() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(sql, (action, module, user_id, json.dumps(details or {}), status))
+
+def get_noc_audit_trail(limit: int = 100, module: str = None) -> list:
+    """Retrieve NOC audit trail entries with optional module filter."""
+    if module:
+        sql = "SELECT * FROM noc_audit_trail WHERE module = %s ORDER BY timestamp DESC LIMIT %s"
+        params = (module, limit)
+    else:
+        sql = "SELECT * FROM noc_audit_trail ORDER BY timestamp DESC LIMIT %s"
+        params = (limit,)
+    with get_cursor() as cur:
+        cur.execute(sql, params)
+        return [dict(r) for r in cur.fetchall()]
 
 if __name__ == "__main__":
     print("Testing database connection...")
