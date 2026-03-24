@@ -1,0 +1,30 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nmap curl gcc sshpass openssh-client && rm -rf /var/lib/apt/lists/*
+
+# Python deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source
+COPY voc/ ./voc/
+COPY ai/ ./ai/
+COPY main.py .
+COPY database.py .
+COPY event_routes.py .
+COPY event_store.py .
+COPY .env .
+
+# Create data directories
+RUN mkdir -p voc/data/nvd_cache voc/data/scans voc/data/reports voc/data/vt_cache \
+             ai/models/saved
+
+EXPOSE 8000
+
+COPY docker/api_start.sh /start.sh
+RUN chmod +x /start.sh
+CMD ["/start.sh"]
