@@ -1,0 +1,92 @@
+# ── ICOC-Lite docker-compose ──────────────────────────────────────────────────
+# Runs on your Windows PC (Docker Desktop)
+#
+# PC (security server):     192.168.237.1   ← Docker runs here
+# Metasploitable (victim):  192.168.237.129 ← agent.py runs here
+# Kali (attacker):          192.168.237.131 ← manual attacks from here
+
+networks:
+  icoc_lab:
+    driver: bridge
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: icoc-db
+    hostname: db
+    networks:
+      - icoc_lab
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB:       icoc
+      POSTGRES_USER:     icoc
+      POSTGRES_PASSWORD: icoc2026
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U icoc -d icoc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: icoc-api
+    hostname: icoc-api
+    networks:
+      - icoc_lab
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./voc:/app/voc
+      - ./ai:/app/ai
+      - ./main.py:/app/main.py
+      - ./database.py:/app/database.py
+      - ./event_store.py:/app/event_store.py
+      - ./event_routes.py:/app/event_routes.py
+      - model_data:/app/ai/models/saved
+    env_file: .env
+    environment:
+      - DEMO_MODE=false
+      - LAB_NETWORK=192.168.237.0/24
+      - LAB_HOSTS=192.168.237.129
+      - VICTIM_IP=192.168.237.129
+      - ATTACKER_IP=192.168.237.131
+      - POSTGRES_URL=postgresql://icoc:icoc2026@db:5432/icoc
+      - ATTACKER_SERVER_URL=http://192.168.237.131:5000
+      - LAB_OFFLINE_MODE=false
+      - VICTIM_SSH_USER=vagrant
+      - VICTIM_SSH_PASS=vagrant
+      - VICTIM_SSH_PORT=22
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: icoc-frontend
+    networks:
+      - icoc_lab
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  model_data:
