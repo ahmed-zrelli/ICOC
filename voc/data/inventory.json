@@ -1,7 +1,962 @@
 {
   "total_hosts": 2,
-  "total_packages": 0,
-  "scanned_at": "2026-03-23T23:09:03.077083Z",
-  "source": "no_data",
-  "entries": []
+  "total_packages": 106,
+  "scanned_at": "2026-03-02T01:57:43.943636Z",
+  "source": "live",
+  "entries": [
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apache2",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "curl",
+      "version": "7.35.0-1ubuntu2.20",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "libc-bin",
+      "version": "2.19-0ubuntu6.15",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "libc6",
+      "version": "2.19-0ubuntu6.15",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "libexpat1",
+      "version": "2.1.0-4ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "libssl-dev",
+      "version": "1.0.1f-1ubuntu2.27",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "openssh-client",
+      "version": "1:6.6p1-2ubuntu2.13",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "openssh-server",
+      "version": "1:6.6p1-2ubuntu2.13",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "openssl",
+      "version": "1.0.1f-1ubuntu2.27",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "python3",
+      "version": "3.4.0-0ubuntu2",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "sudo",
+      "version": "1.8.9p5-1ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "wget",
+      "version": "1.15-1ubuntu1.14.04.5",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "zlib1g",
+      "version": "1:1.2.8.dfsg-1ubuntu1.1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "accountsservice",
+      "version": "0.6.35-0ubuntu7.3",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "acl",
+      "version": "2.2.52-1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "adduser",
+      "version": "3.113+nmu3ubuntu3",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "amd64-microcode",
+      "version": "3.20180524.1~ubuntu0.14.04.2+really20130710.1ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apache2-bin",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apache2-data",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apache2-dev",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apparmor",
+      "version": "2.10.95-0ubuntu2.6~14.04.4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apt",
+      "version": "1.0.1ubuntu2.24",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apt-transport-https",
+      "version": "1.0.1ubuntu2.24",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apt-utils",
+      "version": "1.0.1ubuntu2.24",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "apt-xapian-index",
+      "version": "0.45ubuntu4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "aptitude",
+      "version": "0.6.8.2-1ubuntu4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "aptitude-common",
+      "version": "0.6.8.2-1ubuntu4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "attr",
+      "version": "1:2.4.47-1ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "aufs-tools",
+      "version": "1:3.2+20130722-1.1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "autotools-dev",
+      "version": "20130810.1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "avahi-daemon",
+      "version": "0.6.31-4ubuntu1.3",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "base-files",
+      "version": "7.2ubuntu5.6",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "base-passwd",
+      "version": "3.5.33",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bash",
+      "version": "4.3-7ubuntu1.7",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bash-completion",
+      "version": "1:2.1-4ubuntu0.2",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bc",
+      "version": "1.06.95-8ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bind9-host",
+      "version": "1:9.9.5.dfsg-3ubuntu0.19",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "binutils",
+      "version": "2.24-5ubuntu14.2",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "biosdevname",
+      "version": "0.4.1-0ubuntu6.3",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bsdmainutils",
+      "version": "9.0.5ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bsdutils",
+      "version": "1:2.20.1-5.1ubuntu20.9",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "build-essential",
+      "version": "11.6ubuntu6",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bundler",
+      "version": "1.3.5-2ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "busybox-initramfs",
+      "version": "1:1.21.0-1ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "busybox-static",
+      "version": "1:1.21.0-1ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "bzip2",
+      "version": "1.0.6-5",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "ca-certificates",
+      "version": "20170717~14.04.2",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "ca-certificates-java",
+      "version": "20130815ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "cgroup-lite",
+      "version": "1.9",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "chef",
+      "version": "13.8.5-1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "colord",
+      "version": "1.0.6-1",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "comerr-dev",
+      "version": "2.1-1.42.9-3ubuntu1.3",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.129",
+      "hostname": "metasploitable3",
+      "os": "Ubuntu 14.04",
+      "package": "command-not-found",
+      "version": "0.3ubuntu12",
+      "scanned_at": "2026-03-02T01:57:54.055350Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apache2",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "curl",
+      "version": "7.35.0-1ubuntu2.20",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "libc-bin",
+      "version": "2.19-0ubuntu6.15",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "libc6",
+      "version": "2.19-0ubuntu6.15",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "libexpat1",
+      "version": "2.1.0-4ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "libssl-dev",
+      "version": "1.0.1f-1ubuntu2.27",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "openssh-client",
+      "version": "1:6.6p1-2ubuntu2.13",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "openssh-server",
+      "version": "1:6.6p1-2ubuntu2.13",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "openssl",
+      "version": "1.0.1f-1ubuntu2.27",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "python3",
+      "version": "3.4.0-0ubuntu2",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "sudo",
+      "version": "1.8.9p5-1ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "wget",
+      "version": "1.15-1ubuntu1.14.04.5",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "zlib1g",
+      "version": "1:1.2.8.dfsg-1ubuntu1.1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "accountsservice",
+      "version": "0.6.35-0ubuntu7.3",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "acl",
+      "version": "2.2.52-1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "adduser",
+      "version": "3.113+nmu3ubuntu3",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "amd64-microcode",
+      "version": "3.20180524.1~ubuntu0.14.04.2+really20130710.1ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apache2-bin",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apache2-data",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apache2-dev",
+      "version": "2.4.7-1ubuntu4.22",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apparmor",
+      "version": "2.10.95-0ubuntu2.6~14.04.4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apt",
+      "version": "1.0.1ubuntu2.24",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apt-transport-https",
+      "version": "1.0.1ubuntu2.24",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apt-utils",
+      "version": "1.0.1ubuntu2.24",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "apt-xapian-index",
+      "version": "0.45ubuntu4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "aptitude",
+      "version": "0.6.8.2-1ubuntu4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "aptitude-common",
+      "version": "0.6.8.2-1ubuntu4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "attr",
+      "version": "1:2.4.47-1ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "aufs-tools",
+      "version": "1:3.2+20130722-1.1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "autotools-dev",
+      "version": "20130810.1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "avahi-daemon",
+      "version": "0.6.31-4ubuntu1.3",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "base-files",
+      "version": "7.2ubuntu5.6",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "base-passwd",
+      "version": "3.5.33",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bash",
+      "version": "4.3-7ubuntu1.7",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bash-completion",
+      "version": "1:2.1-4ubuntu0.2",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bc",
+      "version": "1.06.95-8ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bind9-host",
+      "version": "1:9.9.5.dfsg-3ubuntu0.19",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "binutils",
+      "version": "2.24-5ubuntu14.2",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "biosdevname",
+      "version": "0.4.1-0ubuntu6.3",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bsdmainutils",
+      "version": "9.0.5ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bsdutils",
+      "version": "1:2.20.1-5.1ubuntu20.9",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "build-essential",
+      "version": "11.6ubuntu6",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bundler",
+      "version": "1.3.5-2ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "busybox-initramfs",
+      "version": "1:1.21.0-1ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "busybox-static",
+      "version": "1:1.21.0-1ubuntu1.4",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "bzip2",
+      "version": "1.0.6-5",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "ca-certificates",
+      "version": "20170717~14.04.2",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "ca-certificates-java",
+      "version": "20130815ubuntu1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "cgroup-lite",
+      "version": "1.9",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "chef",
+      "version": "13.8.5-1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "colord",
+      "version": "1.0.6-1",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "comerr-dev",
+      "version": "2.1-1.42.9-3ubuntu1.3",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    },
+    {
+      "host_ip": "192.168.237.131",
+      "hostname": "kali-attacker",
+      "os": "Kali Linux",
+      "package": "command-not-found",
+      "version": "0.3ubuntu12",
+      "scanned_at": "2026-03-02T01:57:54.055391Z",
+      "source": "dpkg_live"
+    }
+  ]
 }
