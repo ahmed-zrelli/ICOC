@@ -1,165 +1,160 @@
-# ICOC-Lite — VOC/AI Module (Member 3)
+# ICOC-VOC-NOC: Integrated Cyber Operations Center
 
-Vulnerability Operations Center + AI Risk Engine
-Built with FastAPI · React · scikit-learn · VirusTotal API
+A unified platform combining **Vulnerability Operations Center (VOC)**, **Network Operations Center (NOC)**, and **AI-Driven Risk Orchestration**.
 
----
-
-## 🗂️ Project Structure
-
-```
-icoc-lite/
-├── voc/                          # VOC Module (FR-VOC-01..07)
-│   ├── fr_voc_01_inventory.py    # FR-VOC-01: Software inventory
-│   ├── fr_voc_02_cvss_scoring.py # FR-VOC-02: CVSS v3.1 scoring
-│   ├── fr_voc_03_patch_tracking.py # FR-VOC-03: Patch tracking
-│   ├── fr_voc_04_reports.py      # FR-VOC-04: Vulnerability reports
-│   ├── fr_voc_05_scanner.py      # FR-VOC-05: On-demand scanner + VT
-│   ├── fr_voc_06_nvd_integration.py # FR-VOC-06: NVD/CVE database
-│   ├── fr_voc_07_compliance.py   # FR-VOC-07: PCI-DSS, ISO 27001, NIST
-│   └── virustotal_client.py      # VirusTotal API v3 client
-│
-├── ai/                           # AI Module (FR-AI-01..07)
-│   ├── fr_ai_01_risk_score.py    # FR-AI-01: Global risk score (0-100)
-│   ├── fr_ai_02_ml_prioritization.py # FR-AI-02: ML alert prioritization
-│   ├── fr_ai_03_correlation.py   # FR-AI-03: SOC × VOC correlation
-│   ├── fr_ai_05_07.py            # FR-AI-04..07: Realtime, TI, predict, recs
-│   ├── train.py                  # ML training pipeline
-│   └── models/
-│       ├── exploitability_model.py # Regression: predict CVSS score
-│       ├── severity_classifier.py  # Multi-class: Critical/High/Medium/Low
-│       └── anomaly_detector.py     # Isolation Forest anomaly detection
-│
-├── frontend/                     # React dashboard
-│   └── src/App.jsx               # Full dashboard (5 tabs)
-│
-├── main.py                       # FastAPI server (all endpoints)
-├── docker-compose.yml
-├── requirements.txt
-└── .env                          # API keys + config
-```
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Scikit-Learn](https://img.shields.io/badge/AI-Scikit--Learn-F7931E?style=for-the-badge&logo=scikit-learn)](https://scikit-learn.org/)
+[![Docker](https://img.shields.io/badge/Deployment-Docker-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
 
 ---
 
-## 🚀 Quick Start (Docker — recommended)
+## 📑 Table of Contents
+- [Overview](#-overview)
+- [System Architecture](#-system-architecture)
+- [Key Modules](#-key-modules)
+- [Quick Start](#-quick-start)
+- [Configuration](#-configuration)
+- [ML Pipeline](#-ml-pipeline)
+- [API Documentation](#-api-documentation)
 
+---
+
+## 🎯 Overview
+ICOC-VOC-NOC is a comprehensive cybersecurity and network management solution. It bridges the gap between vulnerability management (VOC) and real-time network monitoring (NOC), using a specialized AI engine to correlate events, prioritize threats, and calculate a global risk score.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph "External Sources"
+        NVD[NVD/CVE API]
+        VT[VirusTotal API]
+        ZBX[Zabbix Server]
+    end
+
+    subgraph "ICOC Backend (FastAPI)"
+        VOC[VOC Module]
+        NOC[NOC Module]
+        AI[AI Risk Engine]
+        DB[(SQLite/Events)]
+    end
+
+    subgraph "Frontend"
+        Dashboard[React Dashboard]
+    end
+
+    NVD --> VOC
+    VT --> VOC
+    ZBX --> NOC
+    VOC --> AI
+    NOC --> AI
+    AI --> DB
+    DB --> Dashboard
+    Dashboard --> VOC
+    Dashboard --> NOC
+```
+
+---
+
+## 🧩 Key Modules
+
+### 🛡️ VOC (Vulnerability Operations)
+- **Inventory Management**: Track software assets and versions.
+- **Vulnerability Scanning**: On-demand scanning with VirusTotal integration.
+- **CVE Integration**: Real-time fetching from NIST NVD database.
+- **Compliance Tracking**: Mapping vulnerabilities to PCI-DSS, ISO 27001, and NIST frameworks.
+
+### 🌐 NOC (Network Operations)
+- **Real-time Monitoring**: Deep integration with Zabbix for alerts and metrics.
+- **Incident Management**: Lifecycle tracking of network performance issues.
+- **Automated Remediation**: Scripted responses to common network failures.
+- **Predictive Analytics**: Forecasting metrics and SLA breach probability.
+
+### 🤖 AI Engine
+- **Risk Scoring**: Dynamic 0-100 global risk score calculation.
+- **Prioritization**: ML-based ranking of security and network alerts.
+- **Correlation**: Identifying links between NOC performance drops and VOC threats.
+- **Anomaly Detection**: Isolation Forest model for detecting unusual CVE patterns.
+
+---
+
+## 🚀 Quick Start
+
+### Docker Deployment (Recommended)
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/ahmed-zrelli/ICOC.git
+    cd ICOC
+    ```
+
+2.  **Configure environment**:
+    ```bash
+    cp .env.example .env # Ensure your API keys and Zabbix URLs are set
+    ```
+
+3.  **Start the platform**:
+    ```bash
+    docker-compose up --build
+    ```
+
+4.  **Initialize AI Models**:
+    ```bash
+    docker exec icoc-api python ai/train.py --synthetic
+    ```
+
+### Local Development
+
+1.  **Backend**:
+    ```bash
+    pip install -r requirements.txt
+    python main.py
+    ```
+
+2.  **Frontend**:
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+
+---
+
+## ⚙️ Configuration
+
+The system is controlled via the `.env` file. Key parameters:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DEMO_MODE` | Enable simulated data for NOC/VOC | `true` |
+| `ZABBIX_API_URL` | URL to your Zabbix RPC endpoint | `http://.../api_jsonrpc.php` |
+| `VT_API_KEY` | Your VirusTotal API Key | `REQUIRED` |
+| `DB_PATH` | Path to SQLite database | `icoc.db` |
+
+---
+
+## 🧠 ML Pipeline
+
+The AI module uses three primary models:
+- **Severity Classifier**: RandomForest model categorizing threats (Critical to Low).
+- **Exploitability Regressor**: GradientBoosting model predicting potential CVSS impact.
+- **Anomaly Detector**: Isolation Forest identifying outliers in threat intelligence.
+
+Train with real data:
 ```bash
-# 1. Clone / unzip project
-cd icoc-lite
-
-# 2. Start full stack (API + Frontend)
-docker-compose up --build
-
-# 3. Train ML models (IMPORTANT — do this first)
-docker exec icoc-api python ai/train.py --synthetic
-
-# OR with real NVD data (slower, needs internet):
-docker exec icoc-api python ai/train.py --download --years 2022 2024
-
-# 4. Open dashboard
-open http://localhost:3000
-
-# 5. API docs (Swagger UI)
-open http://localhost:8000/docs
+python ai/train.py --download --years 2022 2024
 ```
 
 ---
 
-## ⚙️ Without Docker (local Python)
+## 🔌 API Documentation
 
-```bash
-# Install deps
-pip install -r requirements.txt
-
-# Start API
-python main.py
-# → API at http://localhost:8000
-
-# Train models
-python ai/train.py --synthetic    # fast, offline
-python ai/train.py --download     # real NVD data
-
-# Start frontend
-cd frontend
-npm install
-npm run dev
-# → UI at http://localhost:3000
-```
+Once the server is running, access the interactive documentation:
+- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
-
-## 🤖 ML Models
-
-| Model | Type | Input | Output |
-|-------|------|-------|--------|
-| `exploitability_model` | GradientBoosting Regressor | CVSS vector features | Score 0–10 |
-| `severity_classifier` | RandomForest + Calibration | CVSS vector + score | Critical/High/Medium/Low |
-| `anomaly_detector` | Isolation Forest | CVE feature vector | Anomaly flag + score |
-
-Training data: **NIST NVD API 2.0** (real CVEs, 2021–2024) or synthetic fallback.
-
----
-
-## 🔑 API Endpoints
-
-### VOC
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/voc/inventory` | FR-VOC-01: Software inventory |
-| GET | `/voc/cvss/{cve_id}` | FR-VOC-02: CVSS v3.1 score |
-| GET | `/voc/patches` | FR-VOC-03: Patch status |
-| POST | `/voc/patches/apply` | FR-VOC-03: Mark patch applied |
-| GET | `/voc/report` | FR-VOC-04: Vulnerability report |
-| GET | `/voc/report/csv` | FR-VOC-04: CSV export |
-| POST | `/voc/scan` | FR-VOC-05: Trigger scan |
-| GET | `/voc/nvd/recent` | FR-VOC-06: Recent NVD CVEs |
-| GET | `/voc/compliance` | FR-VOC-07: Compliance report |
-
-### VirusTotal
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/vt/hash` | Check file hash |
-| POST | `/vt/ip` | Check IP reputation |
-| POST | `/vt/url` | Check URL |
-
-### AI
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/ai/risk-score` | FR-AI-01: Global risk score |
-| POST | `/ai/prioritize` | FR-AI-02: ML alert ranking |
-| POST | `/ai/correlate` | FR-AI-03: SOC × VOC correlation |
-| GET | `/ai/risk-stream` | FR-AI-04: SSE live updates |
-| GET | `/ai/threat-intel` | FR-AI-05: TI feed |
-| GET | `/ai/predict-incident` | FR-AI-06: Incident probability |
-| GET | `/ai/recommendations` | FR-AI-07: Response recs |
-| GET | `/ai/anomalies` | Anomaly detection |
-| GET | `/ai/train-status` | Model readiness check |
-
-### Dashboard
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/dashboard` | All data in one call |
-
----
-
-## 🌐 Demo Mode
-
-`DEMO_MODE=true` in `.env` means:
-- No real network scanning required
-- Uses synthetic lab hosts (192.168.100.x)
-- All VT API calls still hit VirusTotal live (real results)
-- ML training uses generated or cached NVD data
-
-Set `DEMO_MODE=false` for real nmap scanning (requires root + network access).
-
----
-
-## 🔐 VirusTotal API
-
-Your API key is pre-configured in `.env`.
-Free tier: 4 requests/minute, 500/day.
-Results cached locally for 24h in `voc/data/vt_cache/`.
-
-Known test IOCs:
-- Hash (EICAR): `275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f`
-- Malicious IP: `45.33.32.156`
+*Developed as part of the ICOC Integrated Security Framework.*
