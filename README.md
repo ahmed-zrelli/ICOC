@@ -101,7 +101,7 @@ FIM detects a new file → computes hash → sends to VirusTotal API → fires *
 
 ---
 
-> Crafted with 💙 by Med Taher Borgi
+> Crafted with 💙 by **Med Taher Borgi**
 
 ---
 
