@@ -13,10 +13,10 @@ All commands for starting, stopping, installing agents, running attack simulatio
 
 VMs download Links :
 
-Ubuntu Linux: https://ubuntu.com/download/desktop
-Kali Linux : https://www.kali.org/get-kali/#kali-installer-images
-Vulnerable Windows Server 2012 : https://github.com/vulfilip/grouppvm?tab=readme-ov-file
-Vulnerable Linux (Metasploitable3): https://sourceforge.net/projects/metasploitable3-ub1404upgraded/files/
+> Ubuntu Linux: https://ubuntu.com/download/desktop
+> Kali Linux : https://www.kali.org/get-kali/#kali-installer-images
+> Vulnerable Windows Server 2012 : https://github.com/vulfilip/grouppvm?tab=readme-ov-file
+> Vulnerable Linux (Metasploitable3): https://sourceforge.net/projects/metasploitable3-ub1404upgraded/files/
 
 ---
 
