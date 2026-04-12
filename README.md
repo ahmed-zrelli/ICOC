@@ -9,7 +9,7 @@
 
 ## Operational Runbook
 
-All commands for starting, stopping, installing agents, running attack simulations, and validating each FR are documented in **[WORKFLOW.md](./WORKFLOW.md)**.
+All commands for starting, stopping, installing agents, running attack simulations, and validating each FR are documented in **[WorkflowW.md](./Workflow.md)**.
 
 ---
 
