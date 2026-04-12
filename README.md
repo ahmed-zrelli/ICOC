@@ -11,6 +11,9 @@
 
 All commands for starting, stopping, installing agents, running attack simulations, and validating each FR are documented in **[WorkflowW.md](./Workflow.md)**.
 
+VMs download Links :
+Vulnerable Windows Server 2012 : https://github.com/vulfilip/grouppvm?tab=readme-ov-file
+
 ---
 
 ## What is This Branch?
