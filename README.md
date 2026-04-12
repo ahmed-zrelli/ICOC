@@ -63,7 +63,7 @@ soc/
 ├── ossec-agent-configs/
 │   ├── linux_ossec.conf         ← Agent config file for Kali & Metasploitable3
 │   └── windows_ossec.conf       ← Agent config file for Windows Server 2012
-├── WORKFLOW.md                  ← Full operational runbook
+├── Workflow.md                  ← Full operational runbook
 └── README.md                    ← This file
 ```
 
