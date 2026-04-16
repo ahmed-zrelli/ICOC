@@ -1,0 +1,118 @@
+# ── ICOC-Lite docker-compose ──────────────────────────────────────────────────
+# Updated for SOC+VOC+NOC Integration Lab
+# Runs on Wazuh Manager (192.168.100.10) or PC with access to lab network
+#
+# Wazuh Manager (Ubuntu + Docker): 192.168.100.10  ← Docker runs here (SOC)
+# Windows Endpoint (Server 2012):  192.168.100.101 ← Wazuh agent + VOC target
+# Linux Endpoint (Metasploitable3):192.168.100.102 ← Wazuh agent + VOC target
+# Attacker (Kali Linux):           192.168.100.200 ← Manual attack simulation
+
+networks:
+  icoc_lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  # External network to reach lab VMs (192.168.100.x)
+  lab_network:
+    driver: macvlan
+    driver_opts:
+      parent: eth0  # Change to your actual interface
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: icoc-db
+    hostname: db
+    networks:
+      - icoc_lab
+      - lab_network
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB:       icoc
+      POSTGRES_USER:     icoc
+      POSTGRES_PASSWORD: icoc2026
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U icoc -d icoc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: icoc-api
+    hostname: icoc-api
+    networks:
+      - icoc_lab
+      - lab_network
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./voc:/app/voc
+      - ./ai:/app/ai
+      - ./main.py:/app/main.py
+      - ./database.py:/app/database.py
+      - ./event_store.py:/app/event_store.py
+      - ./event_routes.py:/app/event_routes.py
+      - model_data:/app/ai/models/saved
+    env_file: .env
+    environment:
+      - DEMO_MODE=false
+      - LAB_NETWORK=192.168.100.0/24
+      - LAB_HOSTS=192.168.100.102,192.168.100.101
+      - LAB_EXTRA_HOSTS=192.168.100.101
+      - VICTIM_IP=192.168.100.102
+      - LINUX_VICTIM_IP=192.168.100.102
+      - WINDOWS_VICTIM_IP=192.168.100.101
+      - WAZUH_MANAGER_IP=192.168.100.10
+      - ATTACKER_IP=192.168.100.200
+      - POSTGRES_URL=postgresql://icoc:icoc2026@db:5432/icoc
+      - ATTACKER_SERVER_URL=http://192.168.100.200:5000
+      - WAZUH_API_URL=https://192.168.100.10:55000
+      - WAZUH_API_USER=wazuh-wui
+      - WAZUH_API_PASS=MyS3cr37P450r.*-
+      - WAZUH_API_VERIFY_SSL=false
+      - LAB_OFFLINE_MODE=false
+      - VICTIM_SSH_USER=vagrant
+      - VICTIM_SSH_PASS=vagrant
+      - VICTIM_SSH_PORT=22
+      - WINDOWS_SSH_USER=Administrator
+      - WINDOWS_SSH_PASS=Password123
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: icoc-frontend
+    networks:
+      - icoc_lab
+      - lab_network
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  model_data:

@@ -1,115 +1,165 @@
-# 🛡️ SOC Module
+# ICOC-Lite — VOC/AI Module (Member 3)
 
-**Security Operations Center | Wazuh SIEM 4.8.0**
-
-> Part of the [ICOC-Lite](../README.md) — Integrated Cyber Operations Center Project.  
-> This branch covers the SOC domain exclusively, implementing all 8 SOC functional requirements defined in the project specification.
+Vulnerability Operations Center + AI Risk Engine
+Built with FastAPI · React · scikit-learn · VirusTotal API
 
 ---
 
-## Operational Runbook
-
-All commands for starting, stopping, installing agents, running attack simulations, and validating each FR are documented in **[WorkflowW.md](./Workflow.md)**.
-
-VMs download Links :
-
-- Ubuntu Linux: https://ubuntu.com/download/desktop
-- Kali Linux: https://www.kali.org/get-kali/#kali-installer-images
-- Vulnerable Windows Server 2012: https://github.com/vulfilip/grouppvm?tab=readme-ov-file
-- Vulnerable Linux (Metasploitable3): https://sourceforge.net/projects/metasploitable3-ub1404upgraded/files/
-
----
-
-## What is This Branch?
-
-This branch contains the full implementation of the **Security Operations Center (SOC)** component of ICOC-Lite. The SOC module is built on top of **Wazuh 4.8.0** deployed via Docker and is responsible for:
-
-- Collecting and centralizing security logs from all lab endpoints
-- Detecting attacks in real time and classifying them by severity
-- Automatically blocking attacker IPs without human intervention
-- Monitoring critical system files for unauthorized changes
-- Detecting malware using both local analysis and VirusTotal
-- Identifying abnormal user behavior and privilege abuse
-- Generating exportable incident reports with full IoC timelines
-
----
-
-## Lab Environment
-
-| Machine          | OS                  | IP                | Role              |
-| ---------------- | ------------------- | ----------------- | ----------------- |
-| Wazuh Manager    | Ubuntu + Docker     | `192.168.100.10`  | SIEM core         |
-| Windows Endpoint | Windows Server 2012 | `192.168.100.101` | Monitored target  |
-| Linux Endpoint   | Metasploitable3     | `192.168.100.102` | Monitored target  |
-| Attacker         | Kali Linux          | `192.168.100.200` | Attack simulation |
-
----
-
-## Requirements Coverage
-
-| ID        | Requirement                | How It's Met                                                       |
-| --------- | -------------------------- | ------------------------------------------------------------------ |
-| FR-SOC-01 | Centralized log collection | Wazuh agents deployed on all 4 endpoints, streaming to Manager     |
-| FR-SOC-02 | Brute-force detection      | Rules 5763 (SSH) and 60122 (WinRM/RDP) fire after 5 failures       |
-| FR-SOC-03 | Severity classification    | Native Wazuh rule levels mapped to Critical / High / Medium / Low  |
-| FR-SOC-04 | Automated IP blocking      | Active Response: `firewall-drop` on Linux, `netsh-win` on Windows  |
-| FR-SOC-05 | Incident reporting         | Dashboard PDF/CSV export with timeline and IoCs                    |
-| FR-SOC-06 | File Integrity Monitoring  | Realtime FIM on `/etc`, `/boot`, `System32`, `SysWOW64`            |
-| FR-SOC-07 | Malware detection          | EICAR test + VirusTotal API integration (Level 12 alert confirmed) |
-| FR-SOC-08 | User behavior analytics    | Failed login anomaly and privilege escalation detection            |
-
----
-
-## 📁 Branch Structure
+## 🗂️ Project Structure
 
 ```
-soc/
-├── config/
-│   └── wazuh_cluster/
-│       └── wazuh_manager.conf   ← Active Response + VirusTotal config
-├── ossec-agent-configs/
-│   ├── linux_ossec.conf         ← Agent config file for Kali & Metasploitable3
-│   └── windows_ossec.conf       ← Agent config file for Windows Server 2012
-├── Workflow.md                  ← Full operational runbook
-└── README.md                    ← This file
+icoc-lite/
+├── voc/                          # VOC Module (FR-VOC-01..07)
+│   ├── fr_voc_01_inventory.py    # FR-VOC-01: Software inventory
+│   ├── fr_voc_02_cvss_scoring.py # FR-VOC-02: CVSS v3.1 scoring
+│   ├── fr_voc_03_patch_tracking.py # FR-VOC-03: Patch tracking
+│   ├── fr_voc_04_reports.py      # FR-VOC-04: Vulnerability reports
+│   ├── fr_voc_05_scanner.py      # FR-VOC-05: On-demand scanner + VT
+│   ├── fr_voc_06_nvd_integration.py # FR-VOC-06: NVD/CVE database
+│   ├── fr_voc_07_compliance.py   # FR-VOC-07: PCI-DSS, ISO 27001, NIST
+│   └── virustotal_client.py      # VirusTotal API v3 client
+│
+├── ai/                           # AI Module (FR-AI-01..07)
+│   ├── fr_ai_01_risk_score.py    # FR-AI-01: Global risk score (0-100)
+│   ├── fr_ai_02_ml_prioritization.py # FR-AI-02: ML alert prioritization
+│   ├── fr_ai_03_correlation.py   # FR-AI-03: SOC × VOC correlation
+│   ├── fr_ai_05_07.py            # FR-AI-04..07: Realtime, TI, predict, recs
+│   ├── train.py                  # ML training pipeline
+│   └── models/
+│       ├── exploitability_model.py # Regression: predict CVSS score
+│       ├── severity_classifier.py  # Multi-class: Critical/High/Medium/Low
+│       └── anomaly_detector.py     # Isolation Forest anomaly detection
+│
+├── frontend/                     # React dashboard
+│   └── src/App.jsx               # Full dashboard (5 tabs)
+│
+├── main.py                       # FastAPI server (all endpoints)
+├── docker-compose.yml
+├── requirements.txt
+└── .env                          # API keys + config
 ```
 
 ---
 
-## Stack
+## 🚀 Quick Start (Docker — recommended)
 
-| Component       | Purpose                                 | Version      |
-| --------------- | --------------------------------------- | ------------ |
-| Wazuh Manager   | SIEM core, rule engine, Active Response | 4.8.0        |
-| Wazuh Indexer   | Elasticsearch backend, event storage    | 4.8.0        |
-| Wazuh Dashboard | Web UI, alerting, reporting             | 4.8.0        |
-| Docker Compose  | Container runtime on Manager VM         | —            |
-| VirusTotal API  | External malware hash lookup            | v3 free tier |
+```bash
+# 1. Clone / unzip project
+cd icoc-lite
 
----
+# 2. Start full stack (API + Frontend)
+docker-compose up --build
 
-## Key Configurations
+# 3. Train ML models (IMPORTANT — do this first)
+docker exec icoc-api python ai/train.py --synthetic
 
-### Active Response (Manager)
+# OR with real NVD data (slower, needs internet):
+docker exec icoc-api python ai/train.py --download --years 2022 2024
 
-Two auto-blocking rules configured in `wazuh_manager.conf`:
+# 4. Open dashboard
+open http://localhost:3000
 
-- **Rule 5763** → SSH brute force → `firewall-drop` → blocks attacker on Metasploitable3 for 10 min
-- **Rule 60122** → WinRM/RDP brute force → `netsh-win` → blocks attacker on Windows for 2 min
-
-### File Integrity Monitoring
-
-- **Linux:** realtime monitoring of `/etc`, `/boot`, `/usr/bin`, `/tmp` with diff reporting
-- **Windows:** realtime monitoring of `System32` and `SysWOW64` with noise filters for `.log`, `.tmp`, `.jrs` files
-
-### VirusTotal Integration
-
-FIM detects a new file → computes hash → sends to VirusTotal API → fires **Level 12** alert if flagged.
+# 5. API docs (Swagger UI)
+open http://localhost:8000/docs
+```
 
 ---
 
-> Crafted with 💙 by **Med Taher Borgi**
+## ⚙️ Without Docker (local Python)
+
+```bash
+# Install deps
+pip install -r requirements.txt
+
+# Start API
+python main.py
+# → API at http://localhost:8000
+
+# Train models
+python ai/train.py --synthetic    # fast, offline
+python ai/train.py --download     # real NVD data
+
+# Start frontend
+cd frontend
+npm install
+npm run dev
+# → UI at http://localhost:3000
+```
 
 ---
 
+## 🤖 ML Models
+
+| Model | Type | Input | Output |
+|-------|------|-------|--------|
+| `exploitability_model` | GradientBoosting Regressor | CVSS vector features | Score 0–10 |
+| `severity_classifier` | RandomForest + Calibration | CVSS vector + score | Critical/High/Medium/Low |
+| `anomaly_detector` | Isolation Forest | CVE feature vector | Anomaly flag + score |
+
+Training data: **NIST NVD API 2.0** (real CVEs, 2021–2024) or synthetic fallback.
+
 ---
+
+## 🔑 API Endpoints
+
+### VOC
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/voc/inventory` | FR-VOC-01: Software inventory |
+| GET | `/voc/cvss/{cve_id}` | FR-VOC-02: CVSS v3.1 score |
+| GET | `/voc/patches` | FR-VOC-03: Patch status |
+| POST | `/voc/patches/apply` | FR-VOC-03: Mark patch applied |
+| GET | `/voc/report` | FR-VOC-04: Vulnerability report |
+| GET | `/voc/report/csv` | FR-VOC-04: CSV export |
+| POST | `/voc/scan` | FR-VOC-05: Trigger scan |
+| GET | `/voc/nvd/recent` | FR-VOC-06: Recent NVD CVEs |
+| GET | `/voc/compliance` | FR-VOC-07: Compliance report |
+
+### VirusTotal
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/vt/hash` | Check file hash |
+| POST | `/vt/ip` | Check IP reputation |
+| POST | `/vt/url` | Check URL |
+
+### AI
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/ai/risk-score` | FR-AI-01: Global risk score |
+| POST | `/ai/prioritize` | FR-AI-02: ML alert ranking |
+| POST | `/ai/correlate` | FR-AI-03: SOC × VOC correlation |
+| GET | `/ai/risk-stream` | FR-AI-04: SSE live updates |
+| GET | `/ai/threat-intel` | FR-AI-05: TI feed |
+| GET | `/ai/predict-incident` | FR-AI-06: Incident probability |
+| GET | `/ai/recommendations` | FR-AI-07: Response recs |
+| GET | `/ai/anomalies` | Anomaly detection |
+| GET | `/ai/train-status` | Model readiness check |
+
+### Dashboard
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/dashboard` | All data in one call |
+
+---
+
+## 🌐 Demo Mode
+
+`DEMO_MODE=true` in `.env` means:
+- No real network scanning required
+- Uses synthetic lab hosts (192.168.100.x)
+- All VT API calls still hit VirusTotal live (real results)
+- ML training uses generated or cached NVD data
+
+Set `DEMO_MODE=false` for real nmap scanning (requires root + network access).
+
+---
+
+## 🔐 VirusTotal API
+
+Your API key is pre-configured in `.env`.
+Free tier: 4 requests/minute, 500/day.
+Results cached locally for 24h in `voc/data/vt_cache/`.
+
+Known test IOCs:
+- Hash (EICAR): `275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f`
+- Malicious IP: `45.33.32.156`
