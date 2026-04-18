@@ -331,3 +331,26 @@ def get_remediation(event_id: str):
         "remediation": advice,
         "raw_data":   raw,
     }
+
+@events_router.delete("/purge/{host_ip}", tags=["Events"])
+def purge_host_events(host_ip: str):
+    """Delete all events from a specific host IP (e.g., shutdown VM)."""
+    try:
+        from database import get_conn
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                # Delete events matching host_ip
+                cur.execute("DELETE FROM security_events WHERE host_ip = %s", (host_ip,))
+                deleted = cur.rowcount
+                conn.commit()
+        # Also clear from memory cache
+        from event_store import _cache, _lock
+        with _lock:
+            original_len = len(_cache)
+            _cache.clear()
+            for e in list(_cache):
+                if e.get("host_ip") != host_ip:
+                    _cache.append(e)
+        return {"status": "ok", "deleted_from_db": deleted, "host_ip": host_ip}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

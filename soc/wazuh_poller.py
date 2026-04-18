@@ -1,9 +1,35 @@
 import os
 import time
 import threading
+import datetime
 from typing import Any, Dict, Optional
 
 import requests
+
+
+def _bool_env(name: str, default: bool) -> bool:
+    v = os.getenv(name)
+    if v is None:
+        return default
+    return v.strip().lower() in ("1", "true", "yes", "y", "on")
+
+
+# Max age of alerts to ingest (hours) - skip old stale alerts
+MAX_ALERT_AGE_HOURS = int(os.getenv("WAZUH_MAX_ALERT_AGE_HOURS", "24"))
+
+# Skip alerts from offline agents (shutdown VMs)
+SKIP_OFFLINE_AGENTS = _bool_env("WAZUH_SKIP_OFFLINE_AGENTS", True)
+
+# Wazuh API credentials for agent status check
+WAZUH_API_URL = os.getenv("WAZUH_API_URL", "https://192.168.100.10:55000")
+WAZUH_API_USER = os.getenv("WAZUH_USER", "admin")
+WAZUH_API_PASS = os.getenv("WAZUH_PASS", "SecretPassword")
+WAZUH_VERIFY_TLS = _bool_env("WAZUH_VERIFY_TLS", False)
+
+# Cache for online agents (refresh every 60 seconds)
+_agent_status_cache: Dict[str, tuple] = {}  # {agent_id: (is_active, timestamp)}
+_agent_cache_timestamp = 0
+_agent_cache_ttl = 60
 
 
 _state_lock = threading.Lock()
@@ -14,21 +40,16 @@ _state: Dict[str, Any] = {
     "last_error": None,
     "ingested": 0,
     "dedup_dropped": 0,
-    "filtered_low_severity": 0,
-    "min_rule_level": MIN_RULE_LEVEL,
+    "skipped_too_old": 0,
+    "skipped_offline_agent": 0,
+    "max_age_hours": MAX_ALERT_AGE_HOURS,
+    "skip_offline_agents": SKIP_OFFLINE_AGENTS,
     "last_seen_timestamp": None,
     "last_ingested_event_id": None,
 }
 
 _seen_ids = set()
 _seen_ids_fifo = []
-
-
-def _bool_env(name: str, default: bool) -> bool:
-    v = os.getenv(name)
-    if v is None:
-        return default
-    return v.strip().lower() in ("1", "true", "yes", "y", "on")
 
 
 def _level_to_severity(level: Any) -> str:
@@ -59,9 +80,75 @@ def _safe_get(d: dict, path: str, default=None):
     return cur
 
 
-# Minimum severity to ingest (filters out noise)
-# Levels: 0=Info, 1-3=Low, 4-6=Medium, 7-11=High, 12+=Critical
-MIN_RULE_LEVEL = int(os.getenv("WAZUH_MIN_RULE_LEVEL", "4"))  # Default: Medium+
+def _is_fresh_timestamp(ts: str) -> bool:
+    """Check if alert timestamp is within acceptable age window."""
+    if not ts:
+        return False
+    try:
+        ts_clean = ts.replace('Z', '+00:00')
+        alert_time = datetime.datetime.fromisoformat(ts_clean)
+        now = datetime.datetime.now(datetime.timezone.utc)
+        age_hours = (now - alert_time).total_seconds() / 3600
+        return age_hours <= MAX_ALERT_AGE_HOURS
+    except Exception:
+        return True
+
+
+def _get_active_agent_ids() -> set:
+    """Query Wazuh API for currently active (online) agents."""
+    global _agent_status_cache, _agent_cache_timestamp
+    
+    now = time.time()
+    if now - _agent_cache_timestamp < _agent_cache_ttl and _agent_status_cache:
+        return {agent_id for agent_id, (is_active, _) in _agent_status_cache.items() if is_active}
+    
+    try:
+        # Authenticate
+        auth_resp = requests.post(
+            f"{WAZUH_API_URL}/security/user/authenticate",
+            auth=(WAZUH_API_USER, WAZUH_API_PASS),
+            verify=WAZUH_VERIFY_TLS,
+            timeout=10
+        )
+        if not auth_resp.ok:
+            return set()
+        
+        token = auth_resp.json().get("data", {}).get("token")
+        if not token:
+            return set()
+        
+        # Get agents list
+        headers = {"Authorization": f"Bearer {token}"}
+        agents_resp = requests.get(
+            f"{WAZUH_API_URL}/agents",
+            headers=headers,
+            params={"select": "id,status", "limit": 1000},
+            verify=WAZUH_VERIFY_TLS,
+            timeout=15
+        )
+        
+        if not agents_resp.ok:
+            return set()
+        
+        agents = agents_resp.json().get("data", {}).get("affected_items", [])
+        
+        # Cache agent status
+        _agent_status_cache = {}
+        active_ids = set()
+        for agent in agents:
+            agent_id = str(agent.get("id", ""))
+            status = agent.get("status", "").lower()
+            is_active = status == "active"
+            _agent_status_cache[agent_id] = (is_active, now)
+            if is_active:
+                active_ids.add(agent_id)
+        
+        _agent_cache_timestamp = now
+        return active_ids
+        
+    except Exception as e:
+        print(f"[WAZUH] Failed to get agent status: {e}")
+        return set()
 
 def _build_event_from_wazuh_hit(hit: dict) -> Optional[dict]:
     src = hit.get("_source") or {}
@@ -70,20 +157,24 @@ def _build_event_from_wazuh_hit(hit: dict) -> Optional[dict]:
     if not ts:
         return None
 
-    rule_level = _safe_get(src, "rule.level")
-    rule_id = _safe_get(src, "rule.id")
-    rule_desc = _safe_get(src, "rule.description")
-
-    # Filter out low-severity noise
-    try:
-        if rule_level is not None and int(rule_level) < MIN_RULE_LEVEL:
-            return None
-    except Exception:
-        pass  # Keep alerts where level can't be parsed
-
+    # Extract agent info early
     agent_id = _safe_get(src, "agent.id")
     agent_name = _safe_get(src, "agent.name")
     agent_ip = _safe_get(src, "agent.ip")
+    
+    # Skip old/stale alerts (e.g., from shutdown VMs)
+    if not _is_fresh_timestamp(ts):
+        return None
+    
+    # Skip alerts from offline agents (shutdown VMs)
+    if SKIP_OFFLINE_AGENTS:
+        active_agents = _get_active_agent_ids()
+        if active_agents and agent_id and str(agent_id) not in active_agents:
+            return None
+
+    rule_level = _safe_get(src, "rule.level")
+    rule_id = _safe_get(src, "rule.id")
+    rule_desc = _safe_get(src, "rule.description")
 
     src_ip = (
         _safe_get(src, "data.srcip")
@@ -197,8 +288,12 @@ def _poll_loop():
 
             ingested = 0
             dedup = 0
-            filtered = 0
+            skipped_old = 0
+            skipped_offline = 0
             last_ts = since_ts
+
+            # Pre-fetch active agents once per poll cycle
+            active_agents = _get_active_agent_ids() if SKIP_OFFLINE_AGENTS else set()
 
             for hit in hits:
                 hit_id = hit.get("_id")
@@ -209,9 +304,23 @@ def _poll_loop():
                     dedup += 1
                     continue
 
+                src = hit.get("_source") or {}
+                ts = src.get("@timestamp") or src.get("timestamp")
+                
+                # Check freshness first
+                if ts and not _is_fresh_timestamp(ts):
+                    skipped_old += 1
+                    continue
+                
+                # Check agent status
+                if SKIP_OFFLINE_AGENTS and active_agents:
+                    agent_id = _safe_get(src, "agent.id")
+                    if agent_id and str(agent_id) not in active_agents:
+                        skipped_offline += 1
+                        continue
+
                 evt = _build_event_from_wazuh_hit(hit)
                 if not evt:
-                    filtered += 1  # Track filtered (low severity) events
                     continue
 
                 _seen_ids.add(hit_id)
@@ -236,7 +345,8 @@ def _poll_loop():
                 _state["last_error"] = None
                 _state["ingested"] += ingested
                 _state["dedup_dropped"] += dedup
-                _state["filtered_low_severity"] += filtered
+                _state["skipped_too_old"] += skipped_old
+                _state["skipped_offline_agent"] += skipped_offline
                 _state["last_seen_timestamp"] = last_ts
                 if hits:
                     _state["last_ingested_event_id"] = f"WAZUH-{hits[-1].get('_id')}" if hits[-1].get('_id') else _state.get("last_ingested_event_id")

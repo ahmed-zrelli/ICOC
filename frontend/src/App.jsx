@@ -23,7 +23,33 @@ const THEME = {
 const SEV = { Critical: THEME.critical, High: "#fb923c", Medium: THEME.warning, Low: THEME.accent, Info: THEME.subtext, None: "#6366f1" };
 const SEV_BG = { Critical: "rgba(244, 63, 94, 0.12)", High: "rgba(251, 146, 60, 0.12)", Medium: "rgba(245, 158, 11, 0.12)", Low: "rgba(14, 165, 233, 0.12)", Info: "rgba(148, 163, 184, 0.12)", None: "rgba(99, 102, 241, 0.12)" };
 const STATUS_COLOR = { missing: THEME.critical, available: THEME.warning, scheduled: "#818cf8", applied: THEME.healthy, wontfix: THEME.subtext };
-const EVT_ICONS = { ssh_brute_force:"🔨", ssh_failed_auth:"🔑", ssh_login_success:"🚨", port_scan_detected:"🔍", reverse_shell_detected:"💀", file_integrity_violation:"📝", suspicious_file_drop:"🦠", suspicious_process:"⚙️", cve_exploit_attempt:"💥", malware_dropped:"🦠", dos_started:"🌊", dos_attack:"🌊", heartbeat:"💓", unusual_outbound_connection:"📡", new_port_opened:"🔓", agent_started:"✅", sqli_attack:"💉", lfi_attack:"📂" };
+const EVT_ICONS = { ssh_brute_force:"🔨", ssh_failed_auth:"🔑", ssh_login_success:"🚨", port_scan_detected:"🔍", reverse_shell_detected:"💀", file_integrity_violation:"📝", suspicious_file_drop:"🦠", suspicious_process:"⚙️", cve_exploit_attempt:"💥", malware_dropped:"🦠", dos_started:"🌊", dos_attack:"🌊", heartbeat:"💓", unusual_outbound_connection:"📡", new_port_opened:"🔓", agent_started:"✅", sqli_attack:"💉", lfi_attack:"📂", wazuh_alert:"🔔", pam_auth:"🔐", sudo_escalation:"⬆️" };
+
+// ── Time formatting helper ───────────────────────────────────────────────────
+function formatTimestamp(ts) {
+  if (!ts) return "—";
+  try {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return ts.slice(11, 19);
+    // Format: YYYY-MM-DD HH:MM:SS (local time)
+    const date = d.toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    return `${date} ${time}`;
+  } catch (e) {
+    return ts.slice(11, 19);
+  }
+}
+
+function formatDateOnly(ts) {
+  if (!ts) return "—";
+  try {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return ts.slice(0, 10);
+    return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch (e) {
+    return ts.slice(0, 10);
+  }
+}
 
 // ── Data hooks ────────────────────────────────────────────────────────────────
 function useApi(path, interval = 0) {
@@ -814,13 +840,15 @@ function AlertsTab() {
   const { data: critData, loading: l1 } = useApi("/db/events?limit=500&severity=Critical", 15000);
   const { data: highData, loading: l2 } = useApi("/db/events?limit=500&severity=High", 15000);
   const { data: medData, loading: l3 } = useApi("/db/events?limit=500&severity=Medium", 15000);
+  const { data: lowData, loading: l4 } = useApi("/db/events?limit=500&severity=Low", 15000);
   
-  const loading = l1 || l2 || l3;
+  const loading = l1 || l2 || l3 || l4;
   
   const allEvents = [
     ...(critData?.events || []),
     ...(highData?.events || []),
     ...(medData?.events || []),
+    ...(lowData?.events || []),
   ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   
   const filtered = allEvents.filter(e => {
@@ -836,6 +864,7 @@ function AlertsTab() {
     Critical: allEvents.filter(e => e.severity === "Critical").length,
     High: allEvents.filter(e => e.severity === "High").length,
     Medium: allEvents.filter(e => e.severity === "Medium").length,
+    Low: allEvents.filter(e => e.severity === "Low").length,
   };
   
   return (
@@ -843,10 +872,10 @@ function AlertsTab() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ fontFamily: "Syne,sans-serif", fontSize: 20, color: THEME.critical }}>🚨 Security Alerts</h2>
-          <p style={{ fontSize: 12, color: THEME.subtext, marginTop: 4 }}>All Critical, High and Medium severity events</p>
+          <p style={{ fontSize: 12, color: THEME.subtext, marginTop: 4 }}>All Critical, High, Medium, and Low severity events</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          {[["all","All",null],["Critical","Critical",THEME.critical],["High","High","#fb923c"],["Medium","Medium",THEME.warning]].map(([val,label,color]) => (
+          {[["all","All",null],["Critical","Critical",THEME.critical],["High","High","#fb923c"],["Medium","Medium",THEME.warning],["Low","Low",THEME.accent]].map(([val,label,color]) => (
             <button key={val} onClick={() => setSeverity(val)} style={{
               fontSize: 10, padding: "6px 14px", borderRadius: 8, cursor: "pointer", fontWeight: 700,
               border: `1px solid ${severity === val ? (color || THEME.accent) : THEME.border}`,
@@ -908,7 +937,7 @@ function AlertsTab() {
                       </div>
                       <div style={{ display: "flex", gap: 16, fontSize: 11, color: THEME.subtext, fontFamily: "JetBrains Mono" }}>
                         <span>{e.host_ip}</span>
-                        <span>{e.timestamp?.slice(11, 19)}</span>
+                        <span title={e.timestamp}>{formatTimestamp(e.timestamp)}</span>
                         {e.src_ip && <span style={{ color: THEME.critical }}>SRC: {e.src_ip}</span>}
                       </div>
                     </div>
