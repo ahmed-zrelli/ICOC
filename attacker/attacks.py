@@ -26,11 +26,11 @@ import threading
 import subprocess
 import argparse
 
-VICTIM_IP   = os.getenv("VICTIM_IP",  "192.168.237.129")
+VICTIM_IP   = os.getenv("VICTIM_IP",  "192.168.100.102")
 VICTIM_SSH  = int(os.getenv("VICTIM_SSH_PORT", "22"))
 VICTIM_HTTP = int(os.getenv("VICTIM_HTTP_PORT", "8080"))
-ATTACKER_IP = os.getenv("ATTACKER_IP", "192.168.237.131")
-API_URL     = os.getenv("ICOC_API_URL", "http://192.168.237.1:8000")
+ATTACKER_IP = os.getenv("ATTACKER_IP", "192.168.100.200")
+API_URL     = os.getenv("ICOC_API_URL", "http://192.168.100.1:8000")
 
 # ── Block Check ──────────────────────────────────────────────────────────────
 

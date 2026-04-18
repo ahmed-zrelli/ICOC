@@ -9,7 +9,7 @@ patch_status.json exists on disk. Once the scanner runs a real scan
 (fr_voc_05), it calls save_patch_db() and the JSON file takes over.
 The name is kept for import compatibility with fr_voc_05_scanner.py.
 The CVEs listed here are real CVEs mapped to real lab hosts per the
-ICOC-Lite network topology (192.168.237.0/24).
+ICOC-Lite network topology (192.168.100.0/24).
 """
 
 import json
@@ -49,40 +49,40 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "patch_status.json")
 # ── Initial seed — real CVEs mapped to lab topology ──────────────────────────
 # Loaded only on first run. Overwritten by fr_voc_05 scanner on first real scan.
 # CVE → host mapping follows ICOC-Lite network topology from the cahier des charges.
-# Seed data — only real lab hosts (Metasploitable 3 at 192.168.237.129)
+# Seed data — only real lab hosts (Metasploitable 3 at 192.168.100.102)
 # These are REAL CVEs affecting packages actually present on Metasploitable 3 (Ubuntu 14.04).
 # Replaced automatically after first real nmap scan.
 DEMO_PATCH_DB = [
-    PatchRecord("CVE-2024-6387",  "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2024-6387",  "192.168.100.102", "metasploitable3",
                 "openssh-server", "1:6.6p1-2ubuntu2", "1:9.8p1-1",
                 "missing", 8.1, "High",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")),
-    PatchRecord("CVE-2023-38408", "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2023-38408", "192.168.100.102", "metasploitable3",
                 "openssh-client", "1:6.6p1-2ubuntu2", "1:9.3p2-1",
                 "missing", 9.8, "Critical",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")),
-    PatchRecord("CVE-2021-41617", "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2021-41617", "192.168.100.102", "metasploitable3",
                 "openssh-server", "1:6.6p1-2ubuntu2", "1:8.8p1-1",
                 "missing", 7.0, "High",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")),
-    PatchRecord("CVE-2023-4911",  "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2023-4911",  "192.168.100.102", "metasploitable3",
                 "libc6", "2.19-0ubuntu6", "2.19-0ubuntu6.15",
                 "missing", 7.8, "High",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")),
-    PatchRecord("CVE-2021-3156",  "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2021-3156",  "192.168.100.102", "metasploitable3",
                 "sudo", "1.8.9p5-1ubuntu1", "1.8.9p5-1ubuntu1.5",
                 "missing", 7.8, "High",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")),
-    PatchRecord("CVE-2022-2068",  "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2022-2068",  "192.168.100.102", "metasploitable3",
                 "openssl", "1.0.1f-1ubuntu2", "1.0.1f-1ubuntu2.27",
                 "missing", 9.8, "Critical",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")),
-    PatchRecord("CVE-2014-6271",  "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2014-6271",  "192.168.100.102", "metasploitable3",
                 "bash", "4.3-7ubuntu1", "4.3-14ubuntu1.1",
                 "missing", 9.8, "Critical",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
                 notes="Shellshock — affects Metasploitable 3 bash 4.3"),
-    PatchRecord("CVE-2016-5195",  "192.168.237.129", "metasploitable3",
+    PatchRecord("CVE-2016-5195",  "192.168.100.102", "metasploitable3",
                 "linux-image", "3.13.0-24", "3.13.0-100",
                 "missing", 7.8, "High",
                 datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),

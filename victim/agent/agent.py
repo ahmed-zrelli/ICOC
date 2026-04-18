@@ -18,7 +18,7 @@ import psutil
 from pathlib import Path
 
 API_URL    = os.getenv("ICOC_API_URL", "http://api:8000")
-VICTIM_IP  = os.getenv("VICTIM_IP", "192.168.237.129")
+VICTIM_IP  = os.getenv("VICTIM_IP", "192.168.100.102")
 HOSTNAME   = socket.gethostname()
 AGENT_ID   = f"victim-agent-{HOSTNAME}"
 LOG_PATH   = "/var/log/auth.log"

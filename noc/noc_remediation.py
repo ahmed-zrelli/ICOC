@@ -62,7 +62,7 @@ async def rotate_keys(action: RemediationAction):
 async def block_ip(action: RemediationAction):
     """Functional block: Write IP to shared volume for attacker to read."""
     try:
-        attacker_ip = action.attacker_ip or os.getenv("ATTACKER_IP", "192.168.237.131")
+        attacker_ip = action.attacker_ip or os.getenv("ATTACKER_IP", "192.168.100.200")
         block_file = "/tmp/shared/blocked_ips.txt"
         
         # Append to blocked list if not already there

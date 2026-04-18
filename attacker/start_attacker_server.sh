@@ -3,11 +3,11 @@
 # This replaces the attacker Docker container.
 # Run once after `docker-compose up` — keep it running in a terminal.
 
-export VICTIM_IP=192.168.237.129
+export VICTIM_IP=192.168.100.102
 export VICTIM_SSH_PORT=22
 export VICTIM_HTTP_PORT=8080
-export ATTACKER_IP=192.168.237.131
-export ICOC_API_URL=http://192.168.237.1:8000
+export ATTACKER_IP=192.168.100.200
+export ICOC_API_URL=http://192.168.100.1:8000
 
 echo "[ATTACKER] Installing dependencies..."
 pip3 install requests sshpass 2>/dev/null || true

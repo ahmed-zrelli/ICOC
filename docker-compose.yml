@@ -3,23 +3,28 @@
 # COMBINES: v13 VM Lab Setup + NOC Zabbix Services
 # 
 # NETWORK LEGEND:
-#   192.168.237.x = Your physical lab (VMs on VirtualBox/VMware)
-#   192.168.237.1 = Your Windows PC (Docker host)
-#   192.168.237.129 = Metasploitable3 (victim VM)
-#   192.168.237.131 = Kali Linux (attacker VM)
+#   192.168.100.x = Your physical lab (VMs on VirtualBox/VMware Host-Only)
+#   192.168.100.1 = Your Windows PC (Docker host on host-only adapter)
+#   192.168.100.10 = Wazuh Manager (Ubuntu VM with Docker)
+#   192.168.100.101 = Windows Server 2012 (victim VM)
+#   192.168.100.102 = Metasploitable3 Linux (victim VM)
+#   192.168.100.200 = Kali Linux (attacker VM)
 # 
-# DOCKER SERVICES (internal IPs):
-#   192.168.237.10 = PostgreSQL (ICOC database)
-#   192.168.237.30 = FastAPI backend
-#   192.168.237.40 = React frontend
-#   192.168.237.11 = NOC PostgreSQL (Zabbix DB)
-#   192.168.237.20 = Zabbix Server
-#   192.168.237.21 = Zabbix Web UI
-#   192.168.237.22 = Zabbix Agent
+# DOCKER SERVICES (internal network 172.30.0.0/16):
+#   Docker DNS names are used instead of static IPs
+#   db = PostgreSQL (ICOC database)
+#   icoc-api = FastAPI backend (port 8000)
+#   icoc-frontend = React frontend (port 3000)
+#   noc-postgres = NOC PostgreSQL (Zabbix DB)
+#   noc-zabbix-server = Zabbix Server
+#   noc-zabbix-web = Zabbix Web UI (port 8081)
+#   noc-zabbix-agent = Zabbix Agent
 # 
-# CONTAINERS REPLACED BY VMs:
-#   victim (192.168.100.102) → use VM at 192.168.237.129 instead
-#   attacker (192.168.100.200) → use Kali VM at 192.168.237.131 instead
+# EXTERNAL VMs (not Docker containers):
+#   victim Linux: 192.168.100.102 (Metasploitable3) - scanned via SSH
+#   victim Windows: 192.168.100.101 (Windows Server 2012) - monitored via Wazuh agent
+#   attacker: 192.168.100.200 (Kali Linux) - attack source
+#   wazuh: 192.168.100.10 (Ubuntu VM with Wazuh Docker) - SOC SIEM
 # ═══════════════════════════════════════════════════════════════════════════════
 
 networks:
@@ -27,7 +32,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.237.0/24
+        - subnet: 172.30.0.0/16
 
 services:
   # ═════════════════════════════════════════════════════════════════════════════
@@ -38,8 +43,7 @@ services:
     container_name: icoc-db
     hostname: db
     networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.10
+      icoc_lab: {}
     ports:
       - "5432:5432"
     environment:
@@ -67,8 +71,7 @@ services:
     container_name: icoc-api
     hostname: icoc-api
     networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.30
+      icoc_lab: {}
     ports:
       - "8000:8000"
     volumes:
@@ -76,20 +79,8 @@ services:
       - shared_tmp:/tmp/shared
     env_file: .env
     environment:
-      # [V13] Real VM lab settings
-      - DEMO_MODE=false
-      - LAB_NETWORK=192.168.237.0/24
-      - LAB_HOSTS=192.168.237.129
-      - VICTIM_IP=192.168.237.129
-      - ATTACKER_IP=192.168.237.131
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-icoc}:${POSTGRES_PASSWORD:-icoc2026}@db:5432/${POSTGRES_DB:-icoc}
-      - ATTACKER_SERVER_URL=http://192.168.237.131:5000
-      - LAB_OFFLINE_MODE=false
-      - VICTIM_SSH_USER=vagrant
-      - VICTIM_SSH_PASS=vagrant
-      - VICTIM_SSH_PORT=22
-      # [NOC] Zabbix integration
-      - ZABBIX_API_URL=http://192.168.237.21:8080/api_jsonrpc.php
+      - ZABBIX_API_URL=http://noc-zabbix-web:8080/api_jsonrpc.php
       - ZABBIX_USER=${ZABBIX_USER:-Admin}
       - ZABBIX_PASS=${ZABBIX_PASS:-zabbix}
     depends_on:
@@ -113,32 +104,11 @@ services:
       dockerfile: docker/Dockerfile.frontend
     container_name: icoc-frontend
     networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.40
+      icoc_lab: {}
     ports:
       - "3000:3000"
     depends_on:
       - api
-    restart: unless-stopped
-
-  # ═════════════════════════════════════════════════════════════════════════════
-  # [V13] VICTIM - Docker container replacing the VM
-  # ═════════════════════════════════════════════════════════════════════════════
-  victim:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.victim
-    container_name: icoc-victim
-    hostname: victim
-    networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.129
-    ports:
-      - "2222:22"
-      - "8082:8080"
-    environment:
-      - ICOC_API_URL=http://192.168.237.30:8000
-      - VICTIM_IP=192.168.237.129
     restart: unless-stopped
 
   # ═════════════════════════════════════════════════════════════════════════════
@@ -152,8 +122,7 @@ services:
     container_name: noc-postgres
     hostname: noc-postgres
     networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.11
+      icoc_lab: {}
     environment:
       POSTGRES_DB: ${ZBX_DB_NAME:-zabbix}
       POSTGRES_USER: ${ZBX_DB_USER:-zabbix}
@@ -173,8 +142,7 @@ services:
     container_name: noc-zabbix-server
     hostname: noc-zabbix-server
     networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.20
+      icoc_lab: {}
     ports:
       - "10051:10051"
     environment:
@@ -193,8 +161,7 @@ services:
     container_name: noc-zabbix-web
     hostname: noc-zabbix-web
     networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.21
+      icoc_lab: {}
     ports:
       - "8081:8080"
     environment:
@@ -216,8 +183,7 @@ services:
     container_name: noc-zabbix-agent
     hostname: noc-zabbix-agent
     networks:
-      icoc_lab:
-        ipv4_address: 192.168.237.22
+      icoc_lab: {}
     environment:
       ZBX_HOSTNAME: "Zabbix server"
       ZBX_SERVER_HOST: noc-zabbix-server

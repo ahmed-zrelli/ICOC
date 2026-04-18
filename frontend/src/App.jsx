@@ -1398,7 +1398,7 @@ function OperationsControl() {
       if (rb.id === "isolate_host") { endpoint = "/noc/remediation/isolate-host"; body = { target: rb.target }; }
       else if (rb.id === "apply_patch") { endpoint = "/noc/remediation/apply-patch"; body = { target: rb.target, service_name: rb.service }; }
       else if (rb.id === "rotate_keys") { endpoint = "/noc/remediation/rotate-keys"; body = { target: rb.target, service_name: rb.service }; }
-      else if (rb.id === "block_brute") { endpoint = "/noc/remediation/block-ip"; body = { attacker_ip: "192.168.237.131" }; }
+      else if (rb.id === "block_brute") { endpoint = "/noc/remediation/block-ip"; body = { attacker_ip: "192.168.100.200" }; }
       else if (rb.id === "unblock_all") { endpoint = "/noc/remediation/unblock-all"; body = {}; }
       else if (rb.id === "simulate_traffic") { endpoint = "/noc/remediation/simulate-traffic"; body = {}; }
 
@@ -1427,7 +1427,7 @@ function OperationsControl() {
 
       if (actionId === "scan") {
         endpoint = "/voc/scan";
-        body = { network: "192.168.237.129", enrich_vt: true };
+        body = { network: "192.168.100.102", enrich_vt: true };
         name = "Vulnerability Scan";
       } else if (actionId === "init_db") {
         endpoint = "/db/init";

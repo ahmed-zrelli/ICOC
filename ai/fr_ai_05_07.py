@@ -6,7 +6,7 @@ FR-AI-07: Automated Response Recommendations.
 
 OFFLINE LAB / THREAT INTEL NOTE
 ─────────────────────────────────
-The lab network (192.168.237.0/24) has no outbound internet — adding a
+The lab network (192.168.100.0/24) has no outbound internet — adding a
 routed internet interface just to hit NVD/CISA would break the lab's
 security model. FR-AI-05 is satisfied by an embedded CISA KEV dataset
 (10 entries) that mirrors what a real air-gapped SOC receives via
@@ -58,7 +58,7 @@ STATIC_INTEL = [
         "indicator": "CVE-2024-6387", "severity": "Critical",
         "description": "OpenSSH RegreSSHion — race condition in SIGALRM handler allows "
                        "unauthenticated RCE as root on glibc Linux. Directly affects "
-                       "metasploitable3 (192.168.237.129) running openssh-server 6.6p1.",
+                       "metasploitable3 (192.168.100.102) running openssh-server 6.6p1.",
         "published": "2024-07-01T00:00:00Z",
         "tags": ["rce", "ssh", "linux", "unauthenticated", "actively-exploited"],
         "cisa_kev": True, "cvss_score": 8.1,
@@ -67,7 +67,7 @@ STATIC_INTEL = [
         "id": "TI-IOC-002", "source": "CISA KEV", "type": "cve",
         "indicator": "CVE-2023-38408", "severity": "Critical",
         "description": "OpenSSH ssh-agent remote code execution — malicious agent forwarding "
-                       "allows RCE. Affects metasploitable3 (192.168.237.129).",
+                       "allows RCE. Affects metasploitable3 (192.168.100.102).",
         "published": "2023-07-19T00:00:00Z",
         "tags": ["rce", "ssh", "agent-forwarding", "actively-exploited"],
         "cisa_kev": True, "cvss_score": 9.8,
@@ -76,7 +76,7 @@ STATIC_INTEL = [
         "id": "TI-IOC-003", "source": "CISA KEV", "type": "cve",
         "indicator": "CVE-2014-6271", "severity": "Critical",
         "description": "Shellshock — bash environment variable injection allows unauthenticated RCE "
-                       "via CGI, DHCP, SSH ForceCommand. Metasploitable3 (192.168.237.129) "
+                       "via CGI, DHCP, SSH ForceCommand. Metasploitable3 (192.168.100.102) "
                        "runs bash 4.3 — confirmed vulnerable.",
         "published": "2014-09-24T00:00:00Z",
         "tags": ["rce", "bash", "cgi", "unauthenticated", "actively-exploited"],
@@ -95,7 +95,7 @@ STATIC_INTEL = [
         "id": "TI-IOC-005", "source": "CISA KEV", "type": "cve",
         "indicator": "CVE-2022-2068", "severity": "Critical",
         "description": "OpenSSL c_rehash command injection — allows RCE if attacker controls "
-                       "certificate filenames. Affects metasploitable3 (192.168.237.129) "
+                       "certificate filenames. Affects metasploitable3 (192.168.100.102) "
                        "running openssl 1.0.1f.",
         "published": "2022-06-21T00:00:00Z",
         "tags": ["rce", "openssl", "actively-exploited"],
@@ -124,8 +124,8 @@ STATIC_INTEL = [
         "indicator": "T1190",
         "severity": "High",
         "description": "Exploit Public-Facing Application — initial access via SSH brute force "
-                       "or exploit against metasploitable3 (192.168.237.129) from "
-                       "Kali attacker (192.168.237.131).",
+                       "or exploit against metasploitable3 (192.168.100.102) from "
+                       "Kali attacker (192.168.100.200).",
         "published": "2024-01-01T00:00:00Z",
         "tags": ["initial_access", "mitre", "lab-scenario"],
         "cisa_kev": False, "cvss_score": None,
@@ -135,7 +135,7 @@ STATIC_INTEL = [
         "indicator": "T1110.001",
         "severity": "Medium",
         "description": "Brute Force: Password Guessing — SSH brute-force from Kali "
-                       "(192.168.237.131) against metasploitable3 (192.168.237.129). "
+                       "(192.168.100.200) against metasploitable3 (192.168.100.102). "
                        "Triggers FR-SOC-02 threshold (5 failures / 5 min).",
         "published": "2024-01-01T00:00:00Z",
         "tags": ["credential_access", "brute_force", "mitre", "lab-scenario"],

@@ -26,8 +26,8 @@ from fr_voc_03_patch_tracking import load_patch_db, save_patch_db, DEMO_PATCH_DB
 load_dotenv()
 
 VT_API_KEY  = os.getenv("VIRUSTOTAL_API_KEY")
-# Scan only the victim VM, not the whole network (avoids scanning the PC/gateway)
-LAB_NETWORK = os.getenv("VICTIM_IP", "192.168.237.129")
+# Scan only the Linux victim VM IP from env, not the whole network (avoids scanning the PC/gateway)
+LAB_NETWORK = os.getenv("VICTIM_IP", "192.168.100.102")
 
 # Known fix versions for CVEs commonly found on Metasploitable 3 / Ubuntu 14.04
 # Source: Ubuntu Security Notices (USN) and NVD

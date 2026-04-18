@@ -5,7 +5,7 @@ Caches locally for offline use and ML training data.
 
 OFFLINE LAB NOTE
 ────────────────
-The lab network (192.168.237.0/24) has no outbound internet access.
+The lab network (192.168.100.0/24) has no outbound internet access.
 Run this script ONCE from the host machine (which does have internet)
 before starting the lab, or use 'python fr_voc_06_nvd_integration.py'
 on the dashboard VM if it has a bridged network interface:

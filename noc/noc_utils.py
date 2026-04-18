@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 from fastapi import HTTPException
 
-ZABBIX_API = os.getenv("ZABBIX_API_URL", "http://192.168.237.21:8080/api_jsonrpc.php")
+ZABBIX_API = os.getenv("ZABBIX_API_URL", "http://noc-zabbix-web:8080/api_jsonrpc.php")
 ZABBIX_USER = os.getenv("ZABBIX_USER", "Admin")
 ZABBIX_PASS = os.getenv("ZABBIX_PASS", "zabbix")
 

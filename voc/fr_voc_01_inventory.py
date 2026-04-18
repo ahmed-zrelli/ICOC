@@ -21,17 +21,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-LAB_NETWORK = os.getenv("LAB_NETWORK", "192.168.237.0/24")
+LAB_NETWORK = os.getenv("LAB_NETWORK", "192.168.100.0/24")
 
 # Lab hosts — built from environment variables for real VM support
 # VICTIM_IP env var points to the real Metasploitable VM
-_VICTIM_IP   = os.getenv("VICTIM_IP",   "192.168.237.129")
-_ATTACKER_IP = os.getenv("ATTACKER_IP", "192.168.237.131")
+_VICTIM_IP   = os.getenv("VICTIM_IP",   "192.168.100.102")
+_WIN_VICTIM  = os.getenv("WINDOWS_VICTIM_IP", "192.168.100.101")
+_ATTACKER_IP = os.getenv("ATTACKER_IP", "192.168.100.200")
 
-LAB_HOSTS = [
-    {"ip": _VICTIM_IP,   "hostname": "metasploitable3", "os": "Ubuntu 14.04"},
-    {"ip": _ATTACKER_IP, "hostname": "kali-attacker",   "os": "Kali Linux"},
-]
+_victim_host = os.getenv("VICTIM_HOSTNAME", "metasploitable3")
+_win_host    = os.getenv("WINDOWS_VICTIM_HOSTNAME", "windows2012")
+
+_lab_hosts_env = os.getenv("LAB_HOSTS", "").strip()
+if _lab_hosts_env:
+    LAB_HOSTS = [
+        {"ip": _ip.strip(), "hostname": f"host-{_ip.strip().split('.')[-1]}", "os": "Unknown"}
+        for _ip in _lab_hosts_env.split(",")
+        if _ip.strip()
+    ]
+else:
+    LAB_HOSTS = [
+        {"ip": _WIN_VICTIM,  "hostname": _win_host,    "os": "Windows Server 2012"},
+        {"ip": _VICTIM_IP,   "hostname": _victim_host, "os": "Ubuntu 14.04"},
+        {"ip": _ATTACKER_IP, "hostname": "kali-attacker", "os": "Kali Linux"},
+    ]
 
 # Additional static hosts can be added via LAB_EXTRA_HOSTS env var (comma-separated IPs)
 _extra = os.getenv("LAB_EXTRA_HOSTS", "")
@@ -85,7 +98,7 @@ def _get_dpkg_packages() -> List[tuple]:
     Query installed packages from the victim VM via SSH.
     Returns list of (package, version) tuples.
     """
-    victim_ip = os.getenv("VICTIM_IP", "192.168.237.129")
+    victim_ip = os.getenv("VICTIM_IP", "192.168.100.102")
     ssh_user  = os.getenv("VICTIM_SSH_USER", "vagrant")
     ssh_pass  = os.getenv("VICTIM_SSH_PASS", "vagrant")
     ssh_port  = int(os.getenv("VICTIM_SSH_PORT", "22"))

@@ -153,7 +153,7 @@ def _check_critical_patch_timing(records, days: int = 30) -> dict:
 def _check_scan_coverage(records) -> dict:
     # Only check victim hosts — not the attacker (Kali) which we don't protect
     import os
-    victim_ip = os.getenv("VICTIM_IP", "192.168.237.129")
+    victim_ip = os.getenv("VICTIM_IP", "192.168.100.102")
     expected_hosts = {victim_ip}
     hosts = set(r.host_ip for r in records)
     covered = hosts & expected_hosts

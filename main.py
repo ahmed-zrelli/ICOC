@@ -21,9 +21,11 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 VOC_DIR  = os.path.join(BASE_DIR, "voc")
 AI_DIR   = os.path.join(BASE_DIR, "ai")
 NOC_DIR  = os.path.join(BASE_DIR, "noc")
+SOC_DIR  = os.path.join(BASE_DIR, "soc")
 sys.path.insert(0, VOC_DIR)
 sys.path.insert(0, AI_DIR)
 sys.path.insert(0, NOC_DIR)
+sys.path.insert(0, SOC_DIR)
 
 app = FastAPI(
     title="ICOC-Lite Integrated API",
@@ -118,8 +120,21 @@ def health():
         from database import test_connection
         db_ok = test_connection()
     except Exception:
-        pass
-    return {"status": "ok", "db_connected": db_ok}
+        db_ok = False
+
+    return {
+        "status": "ok",
+        "db": "ok" if db_ok else "down",
+        "demo_mode": os.getenv("DEMO_MODE", "false")
+    }
+
+@app.on_event("startup")
+def _startup_tasks():
+    try:
+        from soc.wazuh_poller import start_wazuh_poller
+        start_wazuh_poller()
+    except Exception as e:
+        print(f"⚠️  SOC module not available: {e}")
 
 # ── VOC Endpoints ─────────────────────────────────────────────────────────────
 
@@ -168,7 +183,7 @@ def get_all_cvss():
     from database import get_cursor
     import os
 
-    victim_ip = os.getenv("VICTIM_IP", "192.168.237.129")
+    victim_ip = os.getenv("VICTIM_IP", "192.168.100.102")
     vector_map = {cve_id: (vec, desc) for cve_id, vec, desc in LAB_CVE_VECTORS}
 
     try:
@@ -584,7 +599,7 @@ def db_init():
 def db_purge_scan():
     """Wipe all scan-generated patch records and CVEs, keeping only victim host data."""
     from database import get_conn
-    victim_ip = os.getenv("VICTIM_IP", "192.168.237.129")
+    victim_ip = os.getenv("VICTIM_IP", "192.168.100.102")
     with get_conn() as conn:
         with conn.cursor() as cur:
             # Delete patch records not belonging to victim
@@ -670,7 +685,7 @@ def db_reseed():
 
 # ── Attack Console Proxy ──────────────────────────────────────────────────────
 
-ATTACKER_URL = os.getenv("ATTACKER_SERVER_URL", "http://192.168.237.131:5000")
+ATTACKER_URL = os.getenv("ATTACKER_SERVER_URL", "http://192.168.100.200:5000")
 
 class AttackRequest(BaseModel):
     attack_id: str
@@ -705,6 +720,17 @@ try:
     print("✅ NOC module loaded successfully")
 except Exception as e:
     print(f"⚠️  NOC module not available: {e}")
+
+
+# ── SOC Routes (Wazuh Integration) ───────────────────────────────────────────
+try:
+    from soc.soc_api import soc_router
+    from soc.wazuh_poller import start_wazuh_poller
+    app.include_router(soc_router)
+    start_wazuh_poller()
+    print("✅ SOC module loaded successfully (Wazuh poller started)")
+except Exception as e:
+    print(f"⚠️  SOC module not available: {e}")
 
 
 if __name__ == "__main__":

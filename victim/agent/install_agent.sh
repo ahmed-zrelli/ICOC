@@ -5,9 +5,9 @@
 
 set -e
 
-KALI_IP="192.168.237.1"
-API_URL="http://192.168.237.1:8000"
-VICTIM_IP="192.168.237.129"
+KALI_IP="192.168.100.1"
+API_URL="http://192.168.100.1:8000"
+VICTIM_IP="192.168.100.102"
 
 echo "[INSTALL] Installing ICOC-Lite victim agent on Metasploitable 3"
 echo "[INSTALL] API URL: ${API_URL}"
