@@ -1,0 +1,202 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# ICOC Hybrid Docker Compose
+# COMBINES: v13 VM Lab Setup + NOC Zabbix Services
+# 
+# NETWORK LEGEND:
+#   192.168.100.x = Your physical lab (VMs on VirtualBox/VMware Host-Only)
+#   192.168.100.1 = Your Windows PC (Docker host on host-only adapter)
+#   192.168.100.10 = Wazuh Manager (Ubuntu VM with Docker)
+#   192.168.100.101 = Windows Server 2012 (victim VM)
+#   192.168.100.102 = Metasploitable3 Linux (victim VM)
+#   192.168.100.200 = Kali Linux (attacker VM)
+# 
+# DOCKER SERVICES (internal network 172.30.0.0/16):
+#   Docker DNS names are used instead of static IPs
+#   db = PostgreSQL (ICOC database)
+#   icoc-api = FastAPI backend (port 8000)
+#   icoc-frontend = React frontend (port 3000)
+#   noc-postgres = NOC PostgreSQL (Zabbix DB)
+#   noc-zabbix-server = Zabbix Server
+#   noc-zabbix-web = Zabbix Web UI (port 8081)
+#   noc-zabbix-agent = Zabbix Agent
+# 
+# EXTERNAL VMs (not Docker containers):
+#   victim Linux: 192.168.100.102 (Metasploitable3) - scanned via SSH
+#   victim Windows: 192.168.100.101 (Windows Server 2012) - monitored via Wazuh agent
+#   attacker: 192.168.100.200 (Kali Linux) - attack source
+#   wazuh: 192.168.100.10 (Ubuntu VM with Wazuh Docker) - SOC SIEM
+# ═══════════════════════════════════════════════════════════════════════════════
+
+networks:
+  icoc_lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+
+services:
+  # ═════════════════════════════════════════════════════════════════════════════
+  # [SHARED] ICOC DATABASE - PostgreSQL for VOC/AI/NOC data
+  # ═════════════════════════════════════════════════════════════════════════════
+  db:
+    image: postgres:16-alpine
+    container_name: icoc-db-v2
+    hostname: db
+    networks:
+      icoc_lab: {}
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-icoc}
+      POSTGRES_USER:     ${POSTGRES_USER:-icoc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-icoc2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U icoc -d icoc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ═════════════════════════════════════════════════════════════════════════════
+  # [V13] VOC/AI API - Your original FastAPI backend
+  # Modified for v13: Uses real VM network, no victim/attacker containers
+  # ═════════════════════════════════════════════════════════════════════════════
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: icoc-api-v2
+    hostname: icoc-api
+    networks:
+      icoc_lab: {}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./voc:/app/voc
+      - ./ai:/app/ai
+      - ./main.py:/app/main.py
+      - ./database.py:/app/database.py
+      - ./event_store.py:/app/event_store.py
+      - ./event_routes.py:/app/event_routes.py
+      - model_data:/app/ai/models/saved
+      - shared_tmp:/tmp/shared
+    env_file: .env
+    environment:
+      - POSTGRES_URL=postgresql://${POSTGRES_USER:-icoc}:${POSTGRES_PASSWORD:-icoc2026}@db:5432/${POSTGRES_DB:-icoc}
+      - ZABBIX_API_URL=http://noc-zabbix-web:8080/api_jsonrpc.php
+      - ZABBIX_USER=${ZABBIX_USER:-Admin}
+      - ZABBIX_PASS=${ZABBIX_PASS:-zabbix}
+    depends_on:
+      db:
+        condition: service_healthy
+      noc-zabbix-server:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ═════════════════════════════════════════════════════════════════════════════
+  # [V13] FRONTEND - React app (your original)
+  # ═════════════════════════════════════════════════════════════════════════════
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: icoc-frontend-v2
+    networks:
+      icoc_lab: {}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # ═════════════════════════════════════════════════════════════════════════════
+  # [NOC] ZABBIX STACK - Friend's contribution (monitoring backend)
+  # These are Docker containers providing monitoring for the NOC tab
+  # ═════════════════════════════════════════════════════════════════════════════
+
+  # [NOC] Zabbix Database - Separate PostgreSQL for Zabbix
+  noc-postgres:
+    image: postgres:15-alpine
+    container_name: noc-postgres
+    hostname: noc-postgres
+    networks:
+      icoc_lab: {}
+    environment:
+      POSTGRES_DB: ${ZBX_DB_NAME:-zabbix}
+      POSTGRES_USER: ${ZBX_DB_USER:-zabbix}
+      POSTGRES_PASSWORD: ${ZBX_DB_PASS:-zabbix123}
+    volumes:
+      - noc_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zabbix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # [NOC] Zabbix Server - Core monitoring engine
+  noc-zabbix-server:
+    image: zabbix/zabbix-server-pgsql:alpine-6.4-latest
+    container_name: noc-zabbix-server
+    hostname: noc-zabbix-server
+    networks:
+      icoc_lab: {}
+    ports:
+      - "10051:10051"
+    environment:
+      DB_SERVER_HOST: noc-postgres
+      POSTGRES_DB: zabbix
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix123
+    depends_on:
+      noc-postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # [NOC] Zabbix Web UI - Access at http://localhost:8081
+  noc-zabbix-web:
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-6.4-latest
+    container_name: noc-zabbix-web
+    hostname: noc-zabbix-web
+    networks:
+      icoc_lab: {}
+    ports:
+      - "8081:8080"
+    environment:
+      ZBX_SERVER_HOST: noc-zabbix-server
+      ZBX_SERVER_PORT: 10051
+      DB_SERVER_HOST: noc-postgres
+      POSTGRES_DB: zabbix
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix123
+      PHP_TZ: UTC
+    depends_on:
+      - noc-postgres
+      - noc-zabbix-server
+    restart: unless-stopped
+
+  # [NOC] Zabbix Agent - For monitoring Docker host
+  noc-zabbix-agent:
+    image: zabbix/zabbix-agent:alpine-6.4-latest
+    container_name: noc-zabbix-agent
+    hostname: noc-zabbix-agent
+    networks:
+      icoc_lab: {}
+    environment:
+      ZBX_HOSTNAME: "Zabbix server"
+      ZBX_SERVER_HOST: noc-zabbix-server
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  noc_postgres_data:
+  model_data:
+  shared_tmp:
