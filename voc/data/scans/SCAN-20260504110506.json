@@ -1,0 +1,179 @@
+{
+  "scan_id": "SCAN-20260504110506",
+  "started_at": "2026-05-04T11:05:06.714940Z",
+  "completed_at": "2026-05-04T11:05:12.855559Z",
+  "network": "192.168.100.102",
+  "mode": "live_nmap",
+  "total_vulnerabilities": 10,
+  "vt_enriched": 1,
+  "severity_summary": {
+    "Critical": 5,
+    "High": 2,
+    "Medium": 3,
+    "Low": 0
+  },
+  "vulnerabilities": [
+    {
+      "cve_id": "CVE-2024-6387",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "openssh-server",
+      "current_version": "",
+      "fixed_version": "1:9.8p1-1",
+      "cvss_score": 8.1,
+      "severity": "High",
+      "status": "missing",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2023-38408",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "openssh-server",
+      "current_version": "",
+      "fixed_version": "1:9.3p2-1",
+      "cvss_score": 9.8,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": true,
+      "vt_ip_report": {
+        "ip": "192.168.100.102",
+        "malicious": 0,
+        "suspicious": 0,
+        "country": "unknown",
+        "asn": 0,
+        "as_owner": "unknown",
+        "reputation": 0,
+        "source": "virustotal_live"
+      }
+    },
+    {
+      "cve_id": "CVE-2021-44790",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "apache2",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 9.8,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": true,
+      "vt_ip_report": {
+        "ip": "192.168.100.102",
+        "malicious": 0,
+        "suspicious": 0,
+        "country": "unknown",
+        "asn": 0,
+        "as_owner": "unknown",
+        "reputation": 0,
+        "source": "virustotal_live"
+      }
+    },
+    {
+      "cve_id": "CVE-2021-42013",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "apache2",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 9.8,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": true,
+      "vt_ip_report": {
+        "ip": "192.168.100.102",
+        "malicious": 0,
+        "suspicious": 0,
+        "country": "unknown",
+        "asn": 0,
+        "as_owner": "unknown",
+        "reputation": 0,
+        "source": "virustotal_live"
+      }
+    },
+    {
+      "cve_id": "CVE-2021-44790",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "apache2",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 9.8,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2021-42013",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "apache2",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 9.8,
+      "severity": "Critical",
+      "status": "missing",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-2021-2154",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "mysql-server",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 7.1,
+      "severity": "High",
+      "status": "missing",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-GENERIC-001",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "postgresql",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 5.0,
+      "severity": "Medium",
+      "status": "missing",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-GENERIC-001",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "http-proxy",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 5.0,
+      "severity": "Medium",
+      "status": "missing",
+      "vt_checked": false
+    },
+    {
+      "cve_id": "CVE-GENERIC-001",
+      "host_ip": "192.168.100.102",
+      "hostname": "192.168.100.102",
+      "package": "https-alt",
+      "current_version": "",
+      "fixed_version": "Upgrade to latest",
+      "cvss_score": 5.0,
+      "severity": "Medium",
+      "status": "missing",
+      "vt_checked": false
+    }
+  ],
+  "vt_ip_reports": {
+    "192.168.100.102": {
+      "ip": "192.168.100.102",
+      "malicious": 0,
+      "suspicious": 0,
+      "country": "unknown",
+      "asn": 0,
+      "as_owner": "unknown",
+      "reputation": 0,
+      "source": "virustotal_live"
+    }
+  }
+}
