@@ -398,6 +398,9 @@ function NoScanBanner({ onScan }) {
     </div>
   );
 }
+
+// ── Scanner Tab — FR-VOC-05 ───────────────────────────────────────────────────
+function ScannerTab() {
   const { data: patches, loading, error } = useApi("/voc/patches", 5000);
   const { data: scanStatus }              = useApi("/voc/scan/status", 2000);
   const [scanMsg, setScanMsg]             = useState(null);
@@ -475,7 +478,11 @@ function NoScanBanner({ onScan }) {
         <table style={{ width:"100%", borderCollapse:"collapse" }}>
           <thead><tr><Th>CVE ID</Th><Th>Affected Host</Th><Th>Component</Th><Th>Current Ver.</Th><Th>Score</Th><Th>Severity</Th><Th>Status</Th></tr></thead>
           <tbody>
-            {records.map((r, i) => (
+            {records.length === 0 ? (
+              <tr><td colSpan="7" style={{ padding: 40, textAlign: "center", color: THEME.subtext }}>
+                No scan data — run a vulnerability scan first
+              </td></tr>
+            ) : records.map((r, i) => (
               <TR key={i}>
                 <Td style={{ color: THEME.accent, fontWeight: 700 }}>{r.cve_id}</Td>
                 <Td style={{ color: THEME.text, fontSize:11 }}>
@@ -494,7 +501,7 @@ function NoScanBanner({ onScan }) {
       </Card>
     </div>
   );
-
+}
 
 // ── VirusTotal Tab ─────────────────────────────────────────────────────────────
 function VTTab() {
@@ -700,8 +707,15 @@ function MLTab() {
 // ── Compliance Tab — FR-VOC-07 ────────────────────────────────────────────────
 function ComplianceTab() {
   const { data, loading, error } = useApi("/voc/compliance");
+  const { data: dbStats }        = useApi("/db/stats");
+
   if (loading) return <Spinner />;
   if (error)   return <ErrorMsg msg={error} />;
+
+  // Show gate if no scan has been run yet
+  const hasScanData = dbStats && (dbStats.patch_records > 0 || dbStats.scan_reports > 0);
+  if (dbStats && !hasScanData) return <NoScanBanner />;
+
   return (
     <div style={{ display:"grid", gap:24 }}>
       {data?.frameworks && Object.entries(data.frameworks).map(([fw, fdata]) => (
