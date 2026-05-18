@@ -8,7 +8,7 @@ import os
 import sys
 import json
 import asyncio
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Query
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
@@ -310,6 +310,33 @@ def vt_hash(req: VTHashCheck):
     """Check a file hash against VirusTotal."""
     from virustotal_client import check_file_hash
     return check_file_hash(req.hash)
+
+@app.post("/vt/file-upload", tags=["VirusTotal"])
+async def vt_file_upload(file: UploadFile):
+    """
+    Upload a file from the browser, compute its SHA256 locally,
+    and check the hash against VirusTotal.
+    The file content is NEVER stored or sent anywhere — only the hash.
+    Max file size: 32 MB.
+    """
+    import hashlib
+    from virustotal_client import check_file_hash
+
+    MAX_SIZE = 32 * 1024 * 1024  # 32 MB
+    content = await file.read(MAX_SIZE + 1)
+    if len(content) > MAX_SIZE:
+        raise HTTPException(status_code=413, detail="File too large (max 32 MB)")
+
+    sha256 = hashlib.sha256(content).hexdigest()
+    md5    = hashlib.md5(content).hexdigest()
+
+    result = check_file_hash(sha256)
+    result["filename"]   = file.filename
+    result["file_size"]  = len(content)
+    result["sha256"]     = sha256
+    result["md5"]        = md5
+    result["hash"]       = sha256  # keep consistent with hash endpoint
+    return result
 
 @app.post("/vt/ip", tags=["VirusTotal"])
 def vt_ip(req: VTIPCheck):

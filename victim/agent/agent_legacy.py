@@ -365,8 +365,13 @@ class NetMonitor(threading.Thread):
                 try:
                     _, lport = self._hex_to_ip_port(parts[1])
                     rip, rport = self._hex_to_ip_port(parts[2])
-                    if rip not in ("0.0.0.0", "127.0.0.1"):
-                        conns.add((lport, rip, rport))
+                    # Skip loopback, unrouted, and same-host connections
+                    if rip in ("0.0.0.0", "127.0.0.1", "::1", VICTIM_IP):
+                        continue
+                    # Skip IPv6-mapped loopback (::ffff:127.x.x.x)
+                    if "127.0.0.1" in rip or rip.startswith("::ffff:127."):
+                        continue
+                    conns.add((lport, rip, rport))
                 except Exception:
                     pass
         return conns

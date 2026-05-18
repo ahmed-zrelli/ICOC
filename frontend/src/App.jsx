@@ -510,6 +510,9 @@ function VTTab() {
   const [result, setResult]   = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   const ENDPOINTS    = { hash:"/vt/hash", ip:"/vt/ip", url:"/vt/url" };
   const FIELDS       = { hash:"hash", ip:"ip", url:"url" };
@@ -523,39 +526,110 @@ function VTTab() {
     } catch (e) { setError(e.message); } finally { setLoading(false); }
   };
 
+  const checkFile = async (file) => {
+    if (!file) return;
+    setLoading(true); setError(null); setResult(null); setSelectedFile(file);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const r = await fetch(API + "/vt/file-upload", { method: "POST", body: formData });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || "Upload failed");
+      setResult(d);
+    } catch (e) { setError(e.message); } finally { setLoading(false); }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault(); setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) checkFile(file);
+  };
+
   const isMalicious = result && (result.malicious || 0) > 0;
 
   return (
     <div style={{ display:"grid", gap:24 }}>
       <Card title="⬡ Threat Intelligence Oracle" badge="VirusTotal v3 API">
+        {/* Mode selector */}
         <div style={{ display:"flex", gap:12, marginBottom:24 }}>
-          {["hash","ip","url"].map(m => (
-            <button key={m} onClick={() => { setMode(m); setResult(null); setInput(""); }} style={{ 
+          {["hash","ip","url","file"].map(m => (
+            <button key={m} onClick={() => { setMode(m); setResult(null); setInput(""); setSelectedFile(null); setError(null); }} style={{ 
               fontFamily:"JetBrains Mono,monospace", fontSize:11, letterSpacing:"0.05em", padding:"8px 18px", borderRadius:8, cursor:"pointer", 
               textTransform:"uppercase", border:`1px solid ${mode===m?THEME.accent:THEME.border}`, 
               background:mode===m?"rgba(14, 165, 233, 0.1)":"transparent", color:mode===m?THEME.accent:THEME.subtext,
               fontWeight: 600, transition: "all 0.2s ease"
             }}>
-              {m === "hash" ? "File Analysis" : m.toUpperCase() + " Reputation"}
+              {m === "hash" ? "File Hash" : m === "file" ? "📁 Upload File" : m.toUpperCase() + " Reputation"}
             </button>
           ))}
         </div>
-        <div style={{ display:"flex", gap:12 }}>
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key==="Enter"&&check()} placeholder={PLACEHOLDERS[mode]}
-            style={{ 
-              flex:1, fontFamily:"JetBrains Mono,monospace", fontSize:12, padding:"12px 16px", borderRadius:8, 
-              background:"rgba(15, 23, 42, 0.4)", border:`1px solid ${THEME.border}`, color: THEME.text, outline:"none",
-              transition: "border-color 0.2s ease"
-            }} onFocus={e => e.target.style.borderColor = THEME.accent} onBlur={e => e.target.style.borderColor = THEME.border} />
-          <button onClick={check} disabled={!input||loading} style={{ 
-            fontFamily:"JetBrains Mono,monospace", fontSize:12, padding:"0 24px", borderRadius:8, border:"none", 
-            background:!input||loading?"rgba(51, 65, 85, 0.5)":THEME.accent, color:"#fff", 
-            cursor:input&&!loading?"pointer":"not-allowed", fontWeight:700, textTransform:"uppercase",
-            boxShadow: !input||loading ? "none" : `0 4px 14px ${THEME.accent}44`
-          }}>
-            {loading ? "Checking..." : "Inspect"}
-          </button>
-        </div>
+
+        {/* File upload mode */}
+        {mode === "file" ? (
+          <div style={{ display:"grid", gap:16 }}>
+            {/* Drag & drop zone */}
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                border: `2px dashed ${dragOver ? THEME.accent : THEME.border}`,
+                borderRadius: 12,
+                padding: "48px 24px",
+                textAlign: "center",
+                cursor: "pointer",
+                background: dragOver ? "rgba(14, 165, 233, 0.06)" : "rgba(15, 23, 42, 0.3)",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <div style={{ fontSize: 40, marginBottom: 12 }}>📁</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: THEME.text, marginBottom: 8 }}>
+                {loading ? "Analyzing..." : selectedFile ? selectedFile.name : "Drop a file here or click to browse"}
+              </div>
+              <div style={{ fontSize: 11, color: THEME.subtext }}>
+                The file is hashed locally — contents are never uploaded or stored. Max 32 MB.
+              </div>
+              {selectedFile && !loading && (
+                <div style={{ marginTop: 12, fontSize: 11, color: THEME.accent, fontFamily: "JetBrains Mono" }}>
+                  {selectedFile.name} — {(selectedFile.size / 1024).toFixed(1)} KB
+                </div>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              style={{ display: "none" }}
+              onChange={(e) => { if (e.target.files[0]) checkFile(e.target.files[0]); }}
+            />
+            {loading && (
+              <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px",
+                background:"rgba(14, 165, 233, 0.08)", borderRadius:8, border:`1px solid ${THEME.accent}33` }}>
+                <div className="spinner" style={{ width:16, height:16, border:`2px solid ${THEME.border}`, borderTop:`2px solid ${THEME.accent}`, borderRadius:"50%", animation:"spin 1s linear infinite", flexShrink:0 }} />
+                <span style={{ fontSize:12, color:THEME.accent, fontWeight:600 }}>Computing SHA256 and querying VirusTotal...</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Hash / IP / URL input mode */
+          <div style={{ display:"flex", gap:12 }}>
+            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key==="Enter"&&check()} placeholder={PLACEHOLDERS[mode]}
+              style={{ 
+                flex:1, fontFamily:"JetBrains Mono,monospace", fontSize:12, padding:"12px 16px", borderRadius:8, 
+                background:"rgba(15, 23, 42, 0.4)", border:`1px solid ${THEME.border}`, color: THEME.text, outline:"none",
+                transition: "border-color 0.2s ease"
+              }} onFocus={e => e.target.style.borderColor = THEME.accent} onBlur={e => e.target.style.borderColor = THEME.border} />
+            <button onClick={check} disabled={!input||loading} style={{ 
+              fontFamily:"JetBrains Mono,monospace", fontSize:12, padding:"0 24px", borderRadius:8, border:"none", 
+              background:!input||loading?"rgba(51, 65, 85, 0.5)":THEME.accent, color:"#fff", 
+              cursor:input&&!loading?"pointer":"not-allowed", fontWeight:700, textTransform:"uppercase",
+              boxShadow: !input||loading ? "none" : `0 4px 14px ${THEME.accent}44`
+            }}>
+              {loading ? "Checking..." : "Inspect"}
+            </button>
+          </div>
+        )}
+
         {error && <div style={{ color: THEME.critical, fontSize:12, marginTop:16, fontWeight: 600 }}>⚠ ANALYSIS ERROR: {error}</div>}
         
         {result && (
@@ -563,12 +637,29 @@ function VTTab() {
             <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:20, padding:"16px 20px", borderRadius:10, background:isMalicious?"rgba(244, 63, 94, 0.1)":"rgba(16, 185, 129, 0.1)" }}>
               <span style={{ fontSize:32 }}>{isMalicious ? "🚨" : "✅"}</span>
               <div>
-                <div style={{ fontFamily:"Syne,sans-serif", fontSize:20, fontWeight:800, color:isMalicious?THEME.critical:THEME.healthy }}>{isMalicious?"MALICIOUS SIGNATURE DETECTED":result.error?"ANALYSIS FAILED":"THREAT NEUTRAL / CLEAN"}</div>
+                <div style={{ fontFamily:"Syne,sans-serif", fontSize:20, fontWeight:800, color:isMalicious?THEME.critical:THEME.healthy }}>
+                  {isMalicious ? "MALICIOUS SIGNATURE DETECTED" : result.error ? "ANALYSIS FAILED" : "THREAT NEUTRAL / CLEAN"}
+                </div>
+                {result.filename && <div style={{ fontSize:12, color:THEME.subtext, marginTop:4, fontFamily:"JetBrains Mono" }}>📁 {result.filename} — {(result.file_size/1024).toFixed(1)} KB</div>}
                 {result.threat_label && <div style={{ fontSize:12, color: THEME.warning, marginTop:4, fontWeight: 600 }}>CLASSIFICATION: {result.threat_label}</div>}
               </div>
             </div>
+
+            {/* SHA256 / MD5 display for file uploads */}
+            {result.sha256 && (
+              <div style={{ marginBottom:16, padding:"12px 16px", background:"rgba(255,255,255,0.02)", borderRadius:8, border:`1px solid ${THEME.border}` }}>
+                <div style={{ fontSize:10, color:THEME.subtext, fontWeight:700, textTransform:"uppercase", marginBottom:6 }}>File Hashes</div>
+                <div style={{ fontSize:11, fontFamily:"JetBrains Mono", color:THEME.text, wordBreak:"break-all" }}>
+                  <span style={{ color:THEME.subtext }}>SHA256: </span>{result.sha256}
+                </div>
+                {result.md5 && <div style={{ fontSize:11, fontFamily:"JetBrains Mono", color:THEME.text, marginTop:4 }}>
+                  <span style={{ color:THEME.subtext }}>MD5: </span>{result.md5}
+                </div>}
+              </div>
+            )}
+
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12 }}>
-              {Object.entries(result).filter(([k]) => !["from_cache","source","file_names","tags","categories","_cached_at"].includes(k)).map(([k,v]) => (
+              {Object.entries(result).filter(([k]) => !["from_cache","source","file_names","tags","categories","_cached_at","filename","sha256","md5","hash"].includes(k)).map(([k,v]) => (
                 <div key={k} style={{ padding:"12px 16px", background:"rgba(255, 255, 255, 0.03)", borderRadius:8, border: `1px solid ${THEME.border}` }}>
                   <div style={{ fontSize:10, color: THEME.subtext, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6, fontWeight: 700 }}>{k.replace(/_/g," ")}</div>
                   <div style={{ fontSize:13, color: THEME.text, wordBreak:"break-all", fontFamily: "JetBrains Mono" }}>{String(v)}</div>
